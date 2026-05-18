@@ -11,8 +11,6 @@ see them, search them, tag them, copy prompts, and clean up messy folders.
 
 This free beta is maintained by Abandoned Muse.
 
-Support/contact: aihax76@gmail.com
-
 Use this app at your own risk. Abandoned Muse is not legally responsible for
 data loss, deleted files, damaged files, app errors, AI mistakes, system issues,
 or anything else that may happen from using this app.
