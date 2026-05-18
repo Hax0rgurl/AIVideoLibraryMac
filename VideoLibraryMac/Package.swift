@@ -3,16 +3,17 @@
 import PackageDescription
 
 let package = Package(
-    name: "SoraLibraryMac",
+    name: "VideoLibraryMac",
     platforms: [
         .macOS(.v13)
     ],
     products: [
-        .executable(name: "SoraLibrary", targets: ["SoraLibraryApp"])
+        .executable(name: "VideoLibrary", targets: ["VideoLibraryApp"])
     ],
     targets: [
         .executableTarget(
-            name: "SoraLibraryApp",
+            name: "VideoLibraryApp",
+            path: "Sources/VideoLibraryApp",
             resources: [
                 .process("Resources")
             ]

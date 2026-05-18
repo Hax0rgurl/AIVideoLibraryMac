@@ -2,14 +2,14 @@
 set -euo pipefail
 
 MODE="${1:-run}"
-APP_NAME="SoraLibrary"
+APP_NAME="VideoLibrary"
 DISPLAY_NAME="Video Library"
 BUNDLE_ID="com.abandonedmuse.soralibrary"
 MIN_SYSTEM_VERSION="13.0"
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 WEB_SOURCE="$ROOT_DIR/../app.html"
-RESOURCE_DIR="$ROOT_DIR/Sources/SoraLibraryApp/Resources"
+RESOURCE_DIR="$ROOT_DIR/Sources/VideoLibraryApp/Resources"
 ICON_SCRIPT="$ROOT_DIR/script/generate_icon.swift"
 ICONSET_DIR="$RESOURCE_DIR/AppIcon.iconset"
 ICON_FILE="$RESOURCE_DIR/AppIcon.icns"

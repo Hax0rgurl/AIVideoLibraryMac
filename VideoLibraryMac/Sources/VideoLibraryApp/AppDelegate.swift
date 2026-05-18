@@ -95,7 +95,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
         let fallback = """
         <!doctype html>
         <html><body style="font:16px -apple-system; padding:24px">
-        <h1>Sora Library could not load app.html</h1>
+        <h1>Video Library could not load app.html</h1>
         <p>The bundled web app resource is missing.</p>
         </body></html>
         """

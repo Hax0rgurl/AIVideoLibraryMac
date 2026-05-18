@@ -1,6 +1,4 @@
-# AIVideoLibraryMac
-Video Library
-=============
+# Video Library
 
 Video Library is a Mac app for organizing large video folders.
 
