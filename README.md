@@ -1,5 +1,9 @@
 # Video Library
 
+[Try the browser demo](https://hax0rgurl.github.io/AIVideoLibraryMac/demo/)
+
+[Download Video Library for Mac](https://github.com/Hax0rgurl/AIVideoLibraryMac/releases/latest/download/Video.Library.zip)
+
 Video Library is a Mac app for organizing large video folders.
 
 It is useful if you make or collect a lot of videos and need a simple way to
@@ -12,6 +16,19 @@ Support/contact: aihax76@gmail.com
 Use this app at your own risk. Abandoned Muse is not legally responsible for
 data loss, deleted files, damaged files, app errors, AI mistakes, system issues,
 or anything else that may happen from using this app.
+
+
+Demo
+----
+
+The browser demo lets you click around with fake sample videos before installing
+the Mac app.
+
+Use the demo to see the layout, search, tags, prompts, filters, metadata panel,
+and batch selection.
+
+The demo does not install anything. Real folder import, Finder actions, local
+video preview, and Ollama setup are part of the Mac app.
 
 
 How to install

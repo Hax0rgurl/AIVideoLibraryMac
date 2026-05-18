@@ -2083,32 +2083,76 @@
           )];
         }
 
+        function isQaHost() {
+          return ["127.0.0.1", "localhost"].includes(location.hostname);
+        }
+
+        function isDemoMode() {
+          return new URLSearchParams(location.search).get("demo") === "1";
+        }
+
         function qaSeedCount() {
-          if (!["127.0.0.1", "localhost"].includes(location.hostname)) return 0;
-          const count = Number(new URLSearchParams(location.search).get("qaSeed"));
+          if (!isQaHost() && !isDemoMode()) return 0;
+          const params = new URLSearchParams(location.search);
+          const count = Number(params.get("qaSeed") || (isDemoMode() ? 240 : 0));
           return Number.isFinite(count) && count > 0 ? Math.min(5000, Math.floor(count)) : 0;
         }
 
         function qaSeedUnorganized() {
-          if (!["127.0.0.1", "localhost"].includes(location.hostname)) return false;
+          if (!isQaHost() && !isDemoMode()) return false;
           return new URLSearchParams(location.search).get("qaUnorganized") === "1";
         }
 
         function makeQaVideos(count) {
           const now = Date.now();
           const unorganized = qaSeedUnorganized();
+          const demoTitles = [
+            "Neon Rain Walkway",
+            "Glass Cabinet Figurines",
+            "Blue Roller Skater",
+            "Smooth Pan Landscape",
+            "Interior Pool Render",
+            "Analog Hallway Loop",
+            "Fashion Studio Turntable",
+            "Mountain Drone Pass",
+            "Robot in Grocery Aisle",
+            "Miniature City Flythrough",
+            "Close-up Cat Portrait",
+            "Desert Highway Sunset"
+          ];
+          const demoTags = [
+            ["neon", "rain", "city", "night"],
+            ["glass-cabinet", "miniature", "display-case"],
+            ["music-video", "fashion", "roller-skates"],
+            ["landscape", "smooth-pan", "nature"],
+            ["pool", "interior", "architecture", "render"],
+            ["analog", "hallway", "vhs", "horror"],
+            ["fashion", "studio", "performance"],
+            ["mountain", "drone", "travel"],
+            ["robot", "grocery", "sci-fi"],
+            ["miniature", "city", "flythrough"],
+            ["cat", "close-up", "animal"],
+            ["desert", "highway", "sunset"]
+          ];
           return Array.from({ length: count }, (_, index) => {
             const number = index + 1;
+            const demoIndex = index % demoTitles.length;
+            const title = isDemoMode()
+              ? `${demoTitles[demoIndex]} ${String(Math.ceil(number / demoTitles.length)).padStart(2, "0")}`
+              : `QA Test Video ${String(number).padStart(4, "0")}`;
+            const tags = isDemoMode()
+              ? [...demoTags[demoIndex], `batch-${Math.ceil(number / ENDLESS_BATCH_SIZE)}`]
+              : ["qa", number % 3 === 0 ? "liminal" : number % 3 === 1 ? "sci-fi" : "architecture", `batch-${Math.ceil(number / ENDLESS_BATCH_SIZE)}`];
             return normalizeVideo({
               id: `qa-${String(number).padStart(4, "0")}`,
-              name: `QA Test Video ${String(number).padStart(4, "0")}.mp4`,
-              title: `QA Test Video ${String(number).padStart(4, "0")}`,
+              name: `${title}.mp4`,
+              title,
               type: unorganized ? "Unknown" : number % 3 === 0 ? "AI" : number % 3 === 1 ? "Real" : "CGI/Digital",
-              tags: unorganized ? [] : ["qa", number % 3 === 0 ? "liminal" : number % 3 === 1 ? "sci-fi" : "architecture", `batch-${Math.ceil(number / ENDLESS_BATCH_SIZE)}`],
+              tags: unorganized ? [] : tags,
               status: "review",
-              prompt: unorganized ? "" : `QA prompt for test video ${number}: a cinematic local video library sample with searchable tags.`,
-              source: "qa-seed",
-              path: `QA/Video-${String(number).padStart(4, "0")}.mp4`,
+              prompt: unorganized ? "" : `Reusable prompt for ${title.toLowerCase()}: cinematic motion, clear subject, organized composition, useful lighting notes, and repeatable style direction.`,
+              source: isDemoMode() ? "browser demo" : "qa-seed",
+              path: `${isDemoMode() ? "Demo Library" : "QA"}/Video-${String(number).padStart(4, "0")}.mp4`,
               ext: "mp4",
               size: 1048576 + number,
               modified: now - number * 1000,
