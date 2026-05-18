@@ -1,0 +1,2938 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sora Library</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #090b0d;
+        --bg-2: #0d1013;
+        --panel: #12161a;
+        --panel-2: #171c21;
+        --panel-3: #1d2329;
+        --line: #2b333b;
+        --line-soft: rgba(160, 177, 193, 0.16);
+        --text: #f4f7f8;
+        --text-soft: #bcc8d1;
+        --muted: #7f8d99;
+        --accent: #22d3c5;
+        --accent-2: #78f3e8;
+        --accent-soft: rgba(34, 211, 197, 0.15);
+        --amber: #f2b84b;
+        --green: #6ddf91;
+        --red: #ff7166;
+        --blue: #75a7ff;
+        --shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
+        --radius: 8px;
+        --radius-sm: 6px;
+        --header: 68px;
+        --sidebar: 264px;
+        --inspector: 368px;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background:
+          linear-gradient(180deg, rgba(27, 34, 40, 0.52), transparent 240px),
+          var(--bg);
+      }
+
+      body {
+        overflow: hidden;
+      }
+
+      button,
+      input,
+      select,
+      textarea {
+        font: inherit;
+      }
+
+      button {
+        appearance: none;
+      }
+
+      .app {
+        display: grid;
+        grid-template-rows: var(--header) minmax(0, 1fr);
+        height: 100vh;
+        min-height: 680px;
+      }
+
+      .topbar {
+        align-items: center;
+        border-bottom: 1px solid var(--line);
+        background: rgba(11, 14, 17, 0.94);
+        display: grid;
+        gap: 14px;
+        grid-template-columns: minmax(216px, 0.72fr) minmax(260px, 1.25fr) auto;
+        padding: 12px 18px;
+      }
+
+      .brand {
+        align-items: center;
+        display: flex;
+        gap: 12px;
+        min-width: 0;
+      }
+
+      .brand-mark {
+        align-items: center;
+        background: linear-gradient(145deg, rgba(34, 211, 197, 0.28), rgba(117, 167, 255, 0.12));
+        border: 1px solid rgba(34, 211, 197, 0.35);
+        border-radius: 8px;
+        color: var(--accent-2);
+        display: inline-flex;
+        flex: 0 0 auto;
+        height: 40px;
+        justify-content: center;
+        width: 40px;
+      }
+
+      .brand h1 {
+        font-size: 17px;
+        font-weight: 760;
+        letter-spacing: 0;
+        line-height: 1.1;
+        margin: 0;
+      }
+
+      .brand span {
+        color: var(--muted);
+        display: block;
+        font-size: 12px;
+        font-weight: 650;
+        line-height: 1.25;
+        margin-top: 3px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .search {
+        align-items: center;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        display: flex;
+        gap: 10px;
+        min-height: 42px;
+        padding: 0 12px;
+      }
+
+      .search svg {
+        color: var(--muted);
+        flex: 0 0 auto;
+      }
+
+      .search input {
+        background: transparent;
+        border: 0;
+        color: var(--text);
+        min-width: 0;
+        outline: 0;
+        width: 100%;
+      }
+
+      .search input::placeholder {
+        color: #6f7c87;
+      }
+
+      .actions {
+        align-items: center;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: flex-end;
+      }
+
+      .btn,
+      .icon-btn,
+      .seg-btn,
+      .chip-btn {
+        align-items: center;
+        border: 1px solid var(--line);
+        border-radius: var(--radius-sm);
+        color: var(--text);
+        cursor: pointer;
+        display: inline-flex;
+        font-size: 13px;
+        font-weight: 720;
+        gap: 8px;
+        justify-content: center;
+        min-height: 38px;
+        padding: 0 12px;
+        transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease, transform 0.16s ease;
+        user-select: none;
+      }
+
+      .btn:disabled,
+      .icon-btn:disabled,
+      .seg-btn:disabled,
+      .chip-btn:disabled {
+        cursor: not-allowed;
+        opacity: 0.48;
+      }
+
+      .btn:not(:disabled):hover,
+      .icon-btn:not(:disabled):hover,
+      .seg-btn:not(:disabled):hover,
+      .chip-btn:not(:disabled):hover {
+        border-color: #41505c;
+        transform: translateY(-1px);
+      }
+
+      .btn:focus-visible,
+      .icon-btn:focus-visible,
+      .seg-btn:focus-visible,
+      .chip-btn:focus-visible,
+      input:focus-visible,
+      select:focus-visible,
+      textarea:focus-visible {
+        outline: 2px solid rgba(34, 211, 197, 0.62);
+        outline-offset: 2px;
+      }
+
+      .btn-primary {
+        background: linear-gradient(180deg, #25d7ca, #11a99f);
+        border-color: #28d8ca;
+        color: #041010;
+      }
+
+      .btn-secondary,
+      .icon-btn,
+      .seg-btn,
+      .chip-btn {
+        background: var(--panel-2);
+      }
+
+      .btn-danger {
+        background: rgba(255, 113, 102, 0.13);
+        border-color: rgba(255, 113, 102, 0.42);
+        color: #ffd2cd;
+      }
+
+      .icon-btn {
+        height: 38px;
+        padding: 0;
+        width: 38px;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: var(--sidebar) minmax(0, 1fr) var(--inspector);
+        min-height: 0;
+      }
+
+      .sidebar,
+      .inspector {
+        background: rgba(15, 18, 22, 0.92);
+        min-height: 0;
+        overflow: auto;
+      }
+
+      .sidebar {
+        border-right: 1px solid var(--line);
+        padding: 16px 12px;
+      }
+
+      .inspector {
+        border-left: 1px solid var(--line);
+        padding: 16px;
+      }
+
+      .main {
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.018), transparent 280px),
+          var(--bg-2);
+        display: grid;
+        grid-template-rows: auto auto minmax(0, 1fr);
+        min-width: 0;
+        overflow: hidden;
+      }
+
+      .panel-title {
+        align-items: center;
+        color: var(--muted);
+        display: flex;
+        font-size: 11px;
+        font-weight: 800;
+        justify-content: space-between;
+        letter-spacing: 0.08em;
+        margin: 6px 6px 8px;
+        text-transform: uppercase;
+      }
+
+      .nav-list {
+        display: grid;
+        gap: 4px;
+        margin-bottom: 18px;
+      }
+
+      .nav-item {
+        align-items: center;
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: var(--radius-sm);
+        color: var(--text-soft);
+        cursor: pointer;
+        display: grid;
+        font-size: 13px;
+        font-weight: 680;
+        gap: 8px;
+        grid-template-columns: 18px minmax(0, 1fr) auto;
+        min-height: 34px;
+        padding: 0 8px;
+        text-align: left;
+        width: 100%;
+      }
+
+      .nav-item:hover {
+        background: rgba(255, 255, 255, 0.04);
+        border-color: var(--line-soft);
+      }
+
+      .nav-item.is-active {
+        background: var(--accent-soft);
+        border-color: rgba(34, 211, 197, 0.36);
+        color: var(--text);
+      }
+
+      .nav-count {
+        color: var(--muted);
+        font-size: 11px;
+        font-variant-numeric: tabular-nums;
+        font-weight: 800;
+      }
+
+      .source-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        display: grid;
+        gap: 10px;
+        margin: 10px 0 18px;
+        padding: 12px;
+      }
+
+      .source-card strong {
+        font-size: 13px;
+      }
+
+      .source-card p {
+        color: var(--text-soft);
+        font-size: 12px;
+        line-height: 1.45;
+        margin: 0;
+      }
+
+      .source-path {
+        color: var(--accent-2);
+        display: block;
+        font-size: 11px;
+        font-weight: 760;
+        margin-top: 5px;
+        overflow-wrap: anywhere;
+      }
+
+      .stats {
+        border-bottom: 1px solid var(--line);
+        display: grid;
+        gap: 10px;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        padding: 14px 16px 12px;
+      }
+
+      .stat {
+        background: rgba(255, 255, 255, 0.026);
+        border: 1px solid var(--line-soft);
+        border-radius: var(--radius);
+        min-width: 0;
+        padding: 10px 12px;
+      }
+
+      .stat span {
+        color: var(--muted);
+        display: block;
+        font-size: 11px;
+        font-weight: 780;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .stat strong {
+        color: var(--text);
+        display: block;
+        font-size: 19px;
+        font-variant-numeric: tabular-nums;
+        line-height: 1.2;
+        margin-top: 4px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .toolbar {
+        align-items: center;
+        border-bottom: 1px solid var(--line);
+        display: grid;
+        gap: 12px;
+        grid-template-columns: minmax(0, 1fr) auto;
+        min-height: 62px;
+        padding: 10px 16px;
+      }
+
+      .toolbar-left,
+      .toolbar-right,
+      .bulkbar,
+      .pagination {
+        align-items: center;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        min-width: 0;
+      }
+
+      .select,
+      .field,
+      .textarea {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: var(--radius-sm);
+        color: var(--text);
+        font-size: 13px;
+        font-weight: 640;
+        min-height: 38px;
+        padding: 0 10px;
+      }
+
+      .select {
+        max-width: 188px;
+      }
+
+      .field {
+        width: 100%;
+      }
+
+      .textarea {
+        line-height: 1.45;
+        min-height: 82px;
+        padding: 10px;
+        resize: vertical;
+      }
+
+      .segment {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        display: inline-flex;
+        gap: 2px;
+        padding: 3px;
+      }
+
+      .seg-btn {
+        border-color: transparent;
+        border-radius: 5px;
+        min-height: 30px;
+        padding: 0 8px;
+      }
+
+      .seg-btn.is-active {
+        background: var(--panel-3);
+        border-color: var(--line);
+        color: var(--accent-2);
+      }
+
+      .library-scroll {
+        min-height: 0;
+        overflow: auto;
+        padding: 16px;
+      }
+
+      .drop-zone {
+        align-items: center;
+        background:
+          linear-gradient(90deg, rgba(34, 211, 197, 0.08), rgba(117, 167, 255, 0.04)),
+          rgba(255, 255, 255, 0.02);
+        border: 1px dashed rgba(34, 211, 197, 0.36);
+        border-radius: var(--radius);
+        color: var(--text-soft);
+        display: flex;
+        gap: 12px;
+        justify-content: space-between;
+        margin-bottom: 14px;
+        min-height: 54px;
+        padding: 10px 12px;
+      }
+
+      .drop-zone.is-dragging {
+        background: rgba(34, 211, 197, 0.15);
+        border-color: var(--accent);
+      }
+
+      .drop-zone strong {
+        color: var(--text);
+        display: block;
+        font-size: 13px;
+      }
+
+      .drop-zone span {
+        display: block;
+        font-size: 12px;
+        margin-top: 2px;
+      }
+
+      .bulkbar {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        justify-content: space-between;
+        margin-bottom: 14px;
+        padding: 10px;
+      }
+
+      .bulkbar[hidden] {
+        display: none;
+      }
+
+      .bulkbar strong {
+        font-size: 13px;
+      }
+
+      .bulk-actions {
+        align-items: center;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: flex-end;
+      }
+
+      .grid {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      }
+
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--line-soft);
+        border-radius: var(--radius);
+        cursor: pointer;
+        min-width: 0;
+        overflow: hidden;
+        position: relative;
+        transition: border-color 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
+      }
+
+      .card:hover {
+        border-color: #40505d;
+        transform: translateY(-2px);
+      }
+
+      .card.is-selected {
+        border-color: rgba(34, 211, 197, 0.82);
+        box-shadow: 0 0 0 1px rgba(34, 211, 197, 0.36), var(--shadow);
+      }
+
+      .thumb {
+        aspect-ratio: 16 / 10;
+        background:
+          linear-gradient(135deg, rgba(34, 211, 197, 0.15), rgba(117, 167, 255, 0.08)),
+          #111820;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .thumb video {
+        display: block;
+        height: 100%;
+        object-fit: cover;
+        width: 100%;
+      }
+
+      .thumb-fallback {
+        align-items: center;
+        color: rgba(244, 247, 248, 0.84);
+        display: flex;
+        flex-direction: column;
+        font-size: 12px;
+        font-weight: 780;
+        height: 100%;
+        justify-content: center;
+        letter-spacing: 0.04em;
+        padding: 14px;
+        text-align: center;
+        text-transform: uppercase;
+      }
+
+      .card-check {
+        background: rgba(5, 8, 10, 0.76);
+        border: 1px solid rgba(255, 255, 255, 0.26);
+        border-radius: 6px;
+        height: 22px;
+        left: 8px;
+        position: absolute;
+        top: 8px;
+        width: 22px;
+        z-index: 3;
+      }
+
+      .card-check:checked {
+        accent-color: var(--accent);
+      }
+
+      .badge-row {
+        bottom: 8px;
+        display: flex;
+        gap: 6px;
+        left: 8px;
+        position: absolute;
+        right: 8px;
+        z-index: 2;
+      }
+
+      .badge {
+        align-items: center;
+        background: rgba(5, 8, 10, 0.76);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 999px;
+        color: #f7fbfc;
+        display: inline-flex;
+        font-size: 11px;
+        font-weight: 760;
+        min-height: 22px;
+        overflow: hidden;
+        padding: 0 8px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .badge.type {
+        background: rgba(34, 211, 197, 0.18);
+        border-color: rgba(34, 211, 197, 0.38);
+        color: var(--accent-2);
+      }
+
+      .card-body {
+        display: grid;
+        gap: 8px;
+        padding: 10px;
+      }
+
+      .card-title {
+        color: var(--text);
+        font-size: 13px;
+        font-weight: 760;
+        line-height: 1.28;
+        margin: 0;
+        min-height: 34px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .meta-row {
+        align-items: center;
+        color: var(--muted);
+        display: flex;
+        font-size: 11px;
+        font-variant-numeric: tabular-nums;
+        font-weight: 650;
+        gap: 8px;
+        justify-content: space-between;
+        min-width: 0;
+      }
+
+      .tag-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        min-height: 22px;
+      }
+
+      .tag {
+        background: rgba(255, 255, 255, 0.055);
+        border: 1px solid var(--line-soft);
+        border-radius: 999px;
+        color: var(--text-soft);
+        font-size: 11px;
+        font-weight: 700;
+        max-width: 100%;
+        overflow: hidden;
+        padding: 3px 7px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .list {
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        overflow: hidden;
+      }
+
+      .row {
+        align-items: center;
+        background: var(--panel);
+        border-bottom: 1px solid var(--line-soft);
+        cursor: pointer;
+        display: grid;
+        gap: 10px;
+        grid-template-columns: 26px minmax(220px, 1.5fr) 120px 110px 100px minmax(130px, 0.8fr);
+        min-height: 50px;
+        padding: 0 12px;
+      }
+
+      .row:last-child {
+        border-bottom: 0;
+      }
+
+      .row:hover,
+      .row.is-selected {
+        background: #182027;
+      }
+
+      .row-title {
+        min-width: 0;
+      }
+
+      .row-title strong,
+      .row-title span {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .row-title strong {
+        font-size: 13px;
+      }
+
+      .row-title span {
+        color: var(--muted);
+        font-size: 11px;
+        margin-top: 3px;
+      }
+
+      .empty {
+        align-items: center;
+        border: 1px dashed var(--line);
+        border-radius: var(--radius);
+        color: var(--text-soft);
+        display: grid;
+        gap: 12px;
+        justify-items: center;
+        min-height: 360px;
+        padding: 28px;
+        text-align: center;
+      }
+
+      .empty svg {
+        color: var(--accent);
+      }
+
+      .empty h2 {
+        color: var(--text);
+        font-size: 22px;
+        margin: 0;
+      }
+
+      .empty p {
+        line-height: 1.55;
+        margin: 0;
+        max-width: 540px;
+      }
+
+      .pagination {
+        justify-content: space-between;
+        margin-top: 16px;
+      }
+
+      .pagination span {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 720;
+      }
+
+      .inspector-empty {
+        align-content: center;
+        color: var(--muted);
+        display: grid;
+        gap: 12px;
+        justify-items: center;
+        min-height: 100%;
+        text-align: center;
+      }
+
+      .preview {
+        background: #050709;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        overflow: hidden;
+      }
+
+      .preview video {
+        background: #050709;
+        display: block;
+        width: 100%;
+      }
+
+      .preview-missing {
+        align-items: center;
+        color: var(--text-soft);
+        display: grid;
+        gap: 8px;
+        min-height: 190px;
+        padding: 20px;
+        text-align: center;
+      }
+
+      .inspector-head {
+        align-items: flex-start;
+        display: flex;
+        gap: 10px;
+        justify-content: space-between;
+        margin: 14px 0;
+      }
+
+      .inspector-head h2 {
+        font-size: 18px;
+        line-height: 1.22;
+        margin: 0;
+        min-width: 0;
+        overflow-wrap: anywhere;
+      }
+
+      .fav {
+        color: var(--muted);
+      }
+
+      .fav.is-on {
+        color: var(--amber);
+      }
+
+      .form {
+        display: grid;
+        gap: 12px;
+      }
+
+      .form label {
+        color: var(--text-soft);
+        display: grid;
+        font-size: 12px;
+        font-weight: 780;
+        gap: 6px;
+      }
+
+      .two-col {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .path-line {
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+      }
+
+      .toast {
+        background: #e8fffc;
+        border-radius: var(--radius);
+        bottom: 18px;
+        box-shadow: var(--shadow);
+        color: #041010;
+        font-size: 13px;
+        font-weight: 760;
+        left: 50%;
+        max-width: min(560px, calc(100vw - 32px));
+        opacity: 0;
+        padding: 12px 14px;
+        pointer-events: none;
+        position: fixed;
+        transform: translate(-50%, 12px);
+        transition: opacity 0.2s ease, transform 0.2s ease;
+        z-index: 20;
+      }
+
+      .toast.is-visible {
+        opacity: 1;
+        transform: translate(-50%, 0);
+      }
+
+      .modal {
+        background: rgba(3, 6, 8, 0.72);
+        display: none;
+        inset: 0;
+        padding: 24px;
+        position: fixed;
+        z-index: 30;
+      }
+
+      .modal.is-open {
+        align-items: center;
+        display: flex;
+        justify-content: center;
+      }
+
+      .ai-panel {
+        background: #101419;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        color: var(--text);
+        display: grid;
+        gap: 14px;
+        grid-template-rows: auto minmax(0, 1fr) auto;
+        max-height: min(860px, calc(100vh - 48px));
+        max-width: 1120px;
+        overflow: hidden;
+        width: min(1120px, 100%);
+      }
+
+      .ai-panel-head,
+      .ai-panel-foot {
+        align-items: center;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        gap: 12px;
+        justify-content: space-between;
+        padding: 14px 16px;
+      }
+
+      .ai-panel-foot {
+        border-bottom: 0;
+        border-top: 1px solid var(--line);
+      }
+
+      .ai-panel-head h2 {
+        font-size: 18px;
+        line-height: 1.15;
+        margin: 0;
+      }
+
+      .ai-panel-head p,
+      .ai-help,
+      .ai-status,
+      .ai-log {
+        color: var(--text-soft);
+        font-size: 12px;
+        line-height: 1.5;
+        margin: 0;
+      }
+
+      .ai-panel-body {
+        display: grid;
+        gap: 14px;
+        grid-template-columns: minmax(260px, 0.82fr) minmax(0, 1.18fr);
+        min-height: 0;
+        overflow: auto;
+        padding: 0 16px 4px;
+      }
+
+      .ai-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        display: grid;
+        gap: 10px;
+        padding: 12px;
+      }
+
+      .ai-card h3 {
+        font-size: 13px;
+        margin: 0;
+      }
+
+      .ai-card label {
+        color: var(--text-soft);
+        display: grid;
+        font-size: 12px;
+        font-weight: 780;
+        gap: 6px;
+      }
+
+      .ai-card .select {
+        max-width: none;
+        width: 100%;
+      }
+
+      .ai-grid {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .ai-output {
+        background: #0b0f13;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        min-height: 268px;
+        overflow: auto;
+        padding: 12px;
+        white-space: pre-wrap;
+      }
+
+      .ai-log strong {
+        color: var(--text);
+      }
+
+      .ai-meter {
+        background: #26313a;
+        border-radius: 999px;
+        height: 8px;
+        overflow: hidden;
+      }
+
+      .ai-meter span {
+        background: linear-gradient(90deg, var(--accent), var(--blue));
+        display: block;
+        height: 100%;
+        width: 0%;
+      }
+
+      .progress {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        display: none;
+        gap: 8px;
+        margin: 0 16px 14px;
+        padding: 10px 12px;
+      }
+
+      .progress.is-visible {
+        display: grid;
+      }
+
+      .progress-row {
+        align-items: center;
+        color: var(--text-soft);
+        display: flex;
+        font-size: 12px;
+        font-weight: 720;
+        justify-content: space-between;
+      }
+
+      .progress-track {
+        background: #26313a;
+        border-radius: 999px;
+        height: 8px;
+        overflow: hidden;
+      }
+
+      .progress-bar {
+        background: linear-gradient(90deg, var(--accent), var(--blue));
+        height: 100%;
+        width: 0%;
+      }
+
+      .hidden-input {
+        display: none;
+      }
+
+      @media (max-width: 1280px) {
+        :root {
+          --sidebar: 226px;
+          --inspector: 330px;
+        }
+
+        .stats {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 980px) {
+        body {
+          overflow: auto;
+        }
+
+        .app {
+          height: auto;
+          min-height: 100vh;
+        }
+
+        .topbar,
+        .layout {
+          grid-template-columns: 1fr;
+        }
+
+        .topbar {
+          min-height: auto;
+        }
+
+        .actions {
+          justify-content: flex-start;
+        }
+
+        .sidebar,
+        .inspector {
+          border: 0;
+          max-height: none;
+        }
+
+        .main {
+          min-height: 720px;
+        }
+
+        .toolbar {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .stats {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .grid {
+          grid-template-columns: 1fr;
+        }
+
+        .row {
+          grid-template-columns: 26px minmax(0, 1fr);
+        }
+
+        .row > :nth-child(n + 3) {
+          display: none;
+        }
+
+        .two-col {
+          grid-template-columns: 1fr;
+        }
+
+        .ai-panel-body,
+        .ai-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 7.2A3.2 3.2 0 0 1 7.2 4h9.6A3.2 3.2 0 0 1 20 7.2v9.6a3.2 3.2 0 0 1-3.2 3.2H7.2A3.2 3.2 0 0 1 4 16.8Z" />
+              <path d="m10 9 5 3-5 3Z" fill="currentColor" stroke="none" />
+            </svg>
+          </div>
+          <div>
+            <h1>Sora Library</h1>
+            <span id="library-subtitle">Local video catalog</span>
+          </div>
+        </div>
+
+        <label class="search" aria-label="Search library">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="7" />
+            <path d="m20 20-3.6-3.6" />
+          </svg>
+          <input id="search-input" type="search" placeholder="Search title, type, tags, prompt, source path" />
+        </label>
+
+        <div class="actions">
+          <button class="btn btn-primary" id="import-folder-btn" type="button">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H10l2 2h6.5A2.5 2.5 0 0 1 21 9.5v7A2.5 2.5 0 0 1 18.5 19h-13A2.5 2.5 0 0 1 3 16.5Z" />
+              <path d="M12 11v5" />
+              <path d="M9.5 13.5H14.5" />
+            </svg>
+            Import Folder
+          </button>
+          <button class="btn btn-secondary" id="import-files-btn" type="button">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 3v4a2 2 0 0 0 2 2h4" />
+              <path d="M5 7a4 4 0 0 1 4-4h5l6 6v8a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4Z" />
+              <path d="M12 12v5" />
+              <path d="M9.5 14.5h5" />
+            </svg>
+            Files
+          </button>
+          <button class="btn btn-secondary" id="export-json-btn" type="button">Backup</button>
+          <button class="btn btn-secondary" id="export-csv-btn" type="button">CSV</button>
+          <button class="btn btn-secondary" id="ai-studio-btn" type="button">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 3v4" />
+              <path d="M12 17v4" />
+              <path d="M3 12h4" />
+              <path d="M17 12h4" />
+              <path d="m5.6 5.6 2.8 2.8" />
+              <path d="m15.6 15.6 2.8 2.8" />
+              <path d="m18.4 5.6-2.8 2.8" />
+              <path d="m8.4 15.6-2.8 2.8" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+            AI Studio
+          </button>
+          <button class="icon-btn" id="import-json-btn" type="button" title="Restore backup" aria-label="Restore backup">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 3v12" />
+              <path d="m7 10 5 5 5-5" />
+              <path d="M5 21h14" />
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <div class="layout">
+        <aside class="sidebar">
+          <div class="panel-title">Library</div>
+          <nav class="nav-list" id="smart-nav" aria-label="Smart filters"></nav>
+
+          <div class="panel-title">Types</div>
+          <nav class="nav-list" id="type-nav" aria-label="Video type filters"></nav>
+
+          <div class="source-card">
+            <strong>Detected local candidate</strong>
+            <p>
+              Your biggest Sora folder appears to be:
+              <span class="source-path">/Users/muse/Downloads/SORA LIBRARY/library</span>
+            </p>
+            <button class="btn btn-secondary" id="import-detected-btn" type="button">Choose This Folder</button>
+          </div>
+
+          <div class="panel-title">Tags</div>
+          <nav class="nav-list" id="tag-nav" aria-label="Tag filters"></nav>
+        </aside>
+
+        <main class="main">
+          <section class="stats" aria-label="Library summary">
+            <div class="stat"><span>Total</span><strong id="stat-total">0</strong></div>
+            <div class="stat"><span>Visible</span><strong id="stat-visible">0</strong></div>
+            <div class="stat"><span>Storage</span><strong id="stat-size">0 MB</strong></div>
+            <div class="stat"><span>Typed</span><strong id="stat-typed">0%</strong></div>
+            <div class="stat"><span>Favorites</span><strong id="stat-favorites">0</strong></div>
+          </section>
+
+          <div class="toolbar">
+            <div class="toolbar-left">
+              <select class="select" id="sort-select" aria-label="Sort videos">
+                <option value="modified-desc">Newest modified</option>
+                <option value="modified-asc">Oldest modified</option>
+                <option value="added-desc">Recently added</option>
+                <option value="title-asc">Title A-Z</option>
+                <option value="size-desc">Largest files</option>
+                <option value="rating-desc">Highest rated</option>
+              </select>
+              <select class="select" id="status-filter" aria-label="Status filter">
+                <option value="all">Any status</option>
+                <option value="review">Needs review</option>
+                <option value="keeper">Keeper</option>
+                <option value="needs-edit">Needs edit</option>
+                <option value="archived">Archived</option>
+                <option value="uncategorized">Uncategorized</option>
+              </select>
+              <button class="btn btn-secondary" id="select-page-btn" type="button">Select Page</button>
+              <button class="btn btn-secondary" id="clear-selection-btn" type="button">Clear Selection</button>
+            </div>
+            <div class="toolbar-right">
+              <div class="segment" aria-label="View mode">
+                <button class="seg-btn is-active" id="grid-view-btn" type="button" title="Grid view" aria-label="Grid view">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z" />
+                  </svg>
+                </button>
+                <button class="seg-btn" id="list-view-btn" type="button" title="List view" aria-label="List view">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M8 6h13M8 12h13M8 18h13" />
+                    <path d="M3 6h.01M3 12h.01M3 18h.01" />
+                  </svg>
+                </button>
+              </div>
+              <select class="select" id="page-size-select" aria-label="Videos per page">
+                <option value="48">48/page</option>
+                <option value="72" selected>72/page</option>
+                <option value="120">120/page</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="progress" id="progress">
+            <div class="progress-row">
+              <span id="progress-label">Scanning</span>
+              <span id="progress-count">0</span>
+            </div>
+            <div class="progress-track"><div class="progress-bar" id="progress-bar"></div></div>
+          </div>
+
+          <section class="library-scroll" id="library-scroll">
+            <div class="drop-zone" id="drop-zone">
+              <div>
+                <strong>Drop Sora videos here or import your library folder.</strong>
+                <span>Metadata stays in this browser. Video files remain where they are on disk.</span>
+              </div>
+              <button class="btn btn-secondary" id="directory-fallback-btn" type="button">Folder Fallback</button>
+            </div>
+
+            <div class="bulkbar" id="bulkbar" hidden>
+              <strong id="bulk-count">0 selected</strong>
+              <div class="bulk-actions">
+                <select class="select" id="bulk-type-select" aria-label="Bulk set type"></select>
+                <button class="btn btn-secondary" id="bulk-apply-type-btn" type="button">Apply Type</button>
+                <select class="select" id="bulk-status-select" aria-label="Bulk set status">
+                  <option value="review">Needs review</option>
+                  <option value="keeper">Keeper</option>
+                  <option value="needs-edit">Needs edit</option>
+                  <option value="archived">Archived</option>
+                  <option value="uncategorized">Uncategorized</option>
+                </select>
+                <button class="btn btn-secondary" id="bulk-apply-status-btn" type="button">Apply Status</button>
+                <button class="btn btn-danger" id="bulk-remove-btn" type="button">Remove From Catalog</button>
+              </div>
+            </div>
+
+            <div id="results"></div>
+            <div class="pagination" id="pagination"></div>
+          </section>
+        </main>
+
+        <aside class="inspector" id="inspector"></aside>
+      </div>
+    </div>
+
+    <div class="modal" id="ai-modal" role="dialog" aria-modal="true" aria-labelledby="ai-title">
+      <section class="ai-panel">
+        <header class="ai-panel-head">
+          <div>
+            <h2 id="ai-title">AI Studio</h2>
+            <p>Connect local or remote agents to classify videos, generate tags, and reconstruct prompts from frames and metadata.</p>
+          </div>
+          <button class="icon-btn" id="ai-close-btn" type="button" aria-label="Close AI Studio">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 6 6 18" />
+              <path d="m6 6 12 12" />
+            </svg>
+          </button>
+        </header>
+
+        <div class="ai-panel-body">
+          <div class="ai-card">
+            <h3>Provider</h3>
+            <label>Engine
+              <select class="select" id="ai-provider">
+                <option value="ollama">Ollama local</option>
+                <option value="gemini">Gemini API</option>
+                <option value="webhook">Agent webhook</option>
+                <option value="prompt-only">Prompt bundle only</option>
+              </select>
+            </label>
+            <div class="ai-grid">
+              <label>Task
+                <select class="select" id="ai-task">
+                  <option value="organize">Organize metadata</option>
+                  <option value="prompt">Create Sora prompt</option>
+                  <option value="tags">Tags and type only</option>
+                </select>
+              </label>
+              <label>Max batch
+                <input class="field" id="ai-max-items" type="number" min="1" max="200" value="12" />
+              </label>
+            </div>
+            <label>Ollama URL
+              <input class="field" id="ai-ollama-url" value="http://127.0.0.1:11434" />
+            </label>
+            <label>Ollama model
+              <input class="field" id="ai-ollama-model" value="llava:latest" />
+            </label>
+            <label>Gemini API key
+              <input class="field" id="ai-gemini-key" type="password" autocomplete="off" placeholder="Stored locally in this catalog" />
+            </label>
+            <label>Gemini model
+              <input class="field" id="ai-gemini-model" value="gemini-2.5-flash" />
+            </label>
+            <label>Agent webhook URL
+              <input class="field" id="ai-webhook-url" placeholder="http://127.0.0.1:8787/sora-library/analyze" />
+            </label>
+            <p class="ai-help">The webhook receives JSON with task, video metadata, tags, and one JPEG frame when available. It should return JSON fields such as title, type, tags, prompt, notes, status, and rating.</p>
+          </div>
+
+          <div class="ai-card">
+            <h3>Workflow</h3>
+            <label>Instruction
+              <textarea class="textarea" id="ai-instruction">Be specific to the visible video. Do not invent named facts. Prefer concise tags, a useful library type, and a reusable Sora-style prompt.</textarea>
+            </label>
+            <div class="ai-grid">
+              <button class="btn btn-primary" id="ai-run-current-btn" type="button">Run Current</button>
+              <button class="btn btn-secondary" id="ai-run-selected-btn" type="button">Run Selected</button>
+              <button class="btn btn-secondary" id="ai-copy-bundle-btn" type="button">Copy Agent Bundle</button>
+              <button class="btn btn-secondary" id="ai-save-settings-btn" type="button">Save Settings</button>
+            </div>
+            <div class="ai-status" id="ai-status">Idle.</div>
+            <div class="ai-meter"><span id="ai-meter"></span></div>
+            <pre class="ai-output ai-log" id="ai-log">No AI workflow has run yet.</pre>
+          </div>
+        </div>
+
+        <footer class="ai-panel-foot">
+          <p class="ai-help">Ollama runs locally. Gemini calls Google with the selected frame and metadata. Prompt bundles and webhooks are for Codex or any other agent you wire up.</p>
+          <button class="btn btn-secondary" id="ai-close-bottom-btn" type="button">Close</button>
+        </footer>
+      </section>
+    </div>
+
+    <input class="hidden-input" id="file-input" type="file" accept="video/*,.mp4,.mov,.webm,.m4v" multiple />
+    <input class="hidden-input" id="folder-input" type="file" accept="video/*,.mp4,.mov,.webm,.m4v" webkitdirectory multiple />
+    <input class="hidden-input" id="json-input" type="file" accept="application/json,.json" />
+    <div class="toast" id="toast"></div>
+
+    <script>
+      (() => {
+        "use strict";
+
+        const DB_NAME = "sora-video-library";
+        const DB_VERSION = 1;
+        const VIDEO_EXTENSIONS = new Set(["mp4", "mov", "webm", "m4v", "avi", "mkv"]);
+        const DETECTED_PATH = "/Users/muse/Downloads/SORA LIBRARY/library";
+        const DEFAULT_TYPES = [
+          "Liminal",
+          "Horror",
+          "Analog/VHS",
+          "Architecture",
+          "Characters",
+          "Sci-Fi",
+          "Surreal",
+          "Fashion",
+          "Animals",
+          "Performance",
+          "Nature",
+          "Cleaned",
+          "Watermarks",
+          "Uncategorized"
+        ];
+        const STATUS_LABELS = {
+          review: "Needs review",
+          keeper: "Keeper",
+          "needs-edit": "Needs edit",
+          archived: "Archived",
+          uncategorized: "Uncategorized"
+        };
+
+        const els = {
+          subtitle: document.getElementById("library-subtitle"),
+          search: document.getElementById("search-input"),
+          importFolder: document.getElementById("import-folder-btn"),
+          importDetected: document.getElementById("import-detected-btn"),
+          importFiles: document.getElementById("import-files-btn"),
+          importJson: document.getElementById("import-json-btn"),
+          exportJson: document.getElementById("export-json-btn"),
+          exportCsv: document.getElementById("export-csv-btn"),
+          aiStudio: document.getElementById("ai-studio-btn"),
+          aiModal: document.getElementById("ai-modal"),
+          aiClose: document.getElementById("ai-close-btn"),
+          aiCloseBottom: document.getElementById("ai-close-bottom-btn"),
+          aiProvider: document.getElementById("ai-provider"),
+          aiTask: document.getElementById("ai-task"),
+          aiMaxItems: document.getElementById("ai-max-items"),
+          aiOllamaUrl: document.getElementById("ai-ollama-url"),
+          aiOllamaModel: document.getElementById("ai-ollama-model"),
+          aiGeminiKey: document.getElementById("ai-gemini-key"),
+          aiGeminiModel: document.getElementById("ai-gemini-model"),
+          aiWebhookUrl: document.getElementById("ai-webhook-url"),
+          aiInstruction: document.getElementById("ai-instruction"),
+          aiRunCurrent: document.getElementById("ai-run-current-btn"),
+          aiRunSelected: document.getElementById("ai-run-selected-btn"),
+          aiCopyBundle: document.getElementById("ai-copy-bundle-btn"),
+          aiSaveSettings: document.getElementById("ai-save-settings-btn"),
+          aiStatus: document.getElementById("ai-status"),
+          aiMeter: document.getElementById("ai-meter"),
+          aiLog: document.getElementById("ai-log"),
+          fileInput: document.getElementById("file-input"),
+          folderInput: document.getElementById("folder-input"),
+          jsonInput: document.getElementById("json-input"),
+          smartNav: document.getElementById("smart-nav"),
+          typeNav: document.getElementById("type-nav"),
+          tagNav: document.getElementById("tag-nav"),
+          statTotal: document.getElementById("stat-total"),
+          statVisible: document.getElementById("stat-visible"),
+          statSize: document.getElementById("stat-size"),
+          statTyped: document.getElementById("stat-typed"),
+          statFavorites: document.getElementById("stat-favorites"),
+          sort: document.getElementById("sort-select"),
+          statusFilter: document.getElementById("status-filter"),
+          selectPage: document.getElementById("select-page-btn"),
+          clearSelection: document.getElementById("clear-selection-btn"),
+          gridView: document.getElementById("grid-view-btn"),
+          listView: document.getElementById("list-view-btn"),
+          pageSize: document.getElementById("page-size-select"),
+          progress: document.getElementById("progress"),
+          progressLabel: document.getElementById("progress-label"),
+          progressCount: document.getElementById("progress-count"),
+          progressBar: document.getElementById("progress-bar"),
+          dropZone: document.getElementById("drop-zone"),
+          directoryFallback: document.getElementById("directory-fallback-btn"),
+          bulkbar: document.getElementById("bulkbar"),
+          bulkCount: document.getElementById("bulk-count"),
+          bulkType: document.getElementById("bulk-type-select"),
+          bulkApplyType: document.getElementById("bulk-apply-type-btn"),
+          bulkStatus: document.getElementById("bulk-status-select"),
+          bulkApplyStatus: document.getElementById("bulk-apply-status-btn"),
+          bulkRemove: document.getElementById("bulk-remove-btn"),
+          results: document.getElementById("results"),
+          pagination: document.getElementById("pagination"),
+          inspector: document.getElementById("inspector"),
+          toast: document.getElementById("toast"),
+          scroll: document.getElementById("library-scroll")
+        };
+
+        const state = {
+          videos: [],
+          selectedId: "",
+          batch: new Set(),
+          smart: "all",
+          type: "all",
+          tag: "all",
+          status: "all",
+          query: "",
+          sort: "modified-desc",
+          view: "grid",
+          page: 1,
+          pageSize: 72,
+          busy: false,
+          ai: {
+            provider: "ollama",
+            task: "organize",
+            maxItems: 12,
+            ollamaUrl: "http://127.0.0.1:11434",
+            ollamaModel: "llava:latest",
+            geminiKey: "",
+            geminiModel: "gemini-2.5-flash",
+            webhookUrl: "",
+            instruction: "Be specific to the visible video. Do not invent named facts. Prefer concise tags, a useful library type, and a reusable Sora-style prompt."
+          }
+        };
+
+        let dbPromise = null;
+        const fileCache = new Map();
+        const urlCache = new Map();
+        const pendingThumbs = new WeakMap();
+        let toastTimer = 0;
+        let renderQueued = false;
+
+        function openDb() {
+          if (dbPromise) return dbPromise;
+          dbPromise = new Promise((resolve, reject) => {
+            const request = indexedDB.open(DB_NAME, DB_VERSION);
+            request.onupgradeneeded = () => {
+              const db = request.result;
+              if (!db.objectStoreNames.contains("videos")) {
+                const store = db.createObjectStore("videos", { keyPath: "id" });
+                store.createIndex("type", "type", { unique: false });
+                store.createIndex("addedAt", "addedAt", { unique: false });
+              }
+              if (!db.objectStoreNames.contains("settings")) {
+                db.createObjectStore("settings", { keyPath: "key" });
+              }
+            };
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+          });
+          return dbPromise;
+        }
+
+        async function dbAll(storeName) {
+          const db = await openDb();
+          return new Promise((resolve, reject) => {
+            const tx = db.transaction(storeName, "readonly");
+            const request = tx.objectStore(storeName).getAll();
+            request.onsuccess = () => resolve(request.result || []);
+            request.onerror = () => reject(request.error);
+          });
+        }
+
+        async function dbPutMany(storeName, values) {
+          if (!values.length) return;
+          const db = await openDb();
+          await new Promise((resolve, reject) => {
+            const tx = db.transaction(storeName, "readwrite");
+            const store = tx.objectStore(storeName);
+            for (const value of values) store.put(value);
+            tx.oncomplete = resolve;
+            tx.onerror = () => reject(tx.error);
+          });
+        }
+
+        async function persistVideos(records) {
+          if (!records.length) return;
+          try {
+            await dbPutMany("videos", records);
+          } catch (error) {
+            console.warn("Retrying video persistence without file handles", error);
+            await dbPutMany("videos", records.map(({ handle, ...record }) => record));
+            showToast("Catalog saved. This browser did not persist file handles, so re-import may be needed after reload.");
+          }
+        }
+
+        async function dbDeleteMany(storeName, keys) {
+          if (!keys.length) return;
+          const db = await openDb();
+          await new Promise((resolve, reject) => {
+            const tx = db.transaction(storeName, "readwrite");
+            const store = tx.objectStore(storeName);
+            for (const key of keys) store.delete(key);
+            tx.oncomplete = resolve;
+            tx.onerror = () => reject(tx.error);
+          });
+        }
+
+        async function loadSettings() {
+          const rows = await dbAll("settings");
+          const settings = Object.fromEntries(rows.map((row) => [row.key, row.value]));
+          Object.assign(state, {
+            smart: settings.smart || "all",
+            type: settings.type || "all",
+            tag: settings.tag || "all",
+            status: settings.status || "all",
+            query: settings.query || "",
+            sort: settings.sort || "modified-desc",
+            view: settings.view || "grid",
+            pageSize: Number(settings.pageSize) || 72,
+            selectedId: settings.selectedId || "",
+            ai: { ...state.ai, ...(settings.ai || {}) }
+          });
+        }
+
+        async function saveSettings() {
+          await dbPutMany("settings", [
+            { key: "smart", value: state.smart },
+            { key: "type", value: state.type },
+            { key: "tag", value: state.tag },
+            { key: "status", value: state.status },
+            { key: "query", value: state.query },
+            { key: "sort", value: state.sort },
+            { key: "view", value: state.view },
+            { key: "pageSize", value: state.pageSize },
+            { key: "selectedId", value: state.selectedId },
+            { key: "ai", value: state.ai }
+          ]);
+        }
+
+        function normalizeVideo(row) {
+          const type = row.type || inferType(row.name || row.title || "", row.path || "");
+          return {
+            id: row.id || hashString(`${row.path || row.name}|${row.size || 0}|${row.modified || 0}`),
+            name: row.name || "Untitled video",
+            title: row.title || cleanTitle(row.name || "Untitled video"),
+            type,
+            tags: Array.isArray(row.tags) ? row.tags.filter(Boolean) : inferTags(row.name || "", row.path || ""),
+            status: row.status || (type === "Uncategorized" ? "review" : "uncategorized"),
+            rating: Number(row.rating) || 0,
+            favorite: row.favorite === true,
+            notes: row.notes || "",
+            prompt: row.prompt || "",
+            source: row.source || "",
+            path: row.path || row.name || "",
+            ext: row.ext || extensionOf(row.name || ""),
+            size: Number(row.size) || 0,
+            modified: Number(row.modified) || 0,
+            addedAt: row.addedAt || new Date().toISOString(),
+            duration: Number(row.duration) || 0,
+            width: Number(row.width) || 0,
+            height: Number(row.height) || 0,
+            handle: row.handle || null
+          };
+        }
+
+        function mergeVideo(existing, incoming) {
+          if (!existing) return incoming;
+          return {
+            ...incoming,
+            title: existing.title || incoming.title,
+            type: existing.type || incoming.type,
+            tags: existing.tags?.length ? existing.tags : incoming.tags,
+            status: existing.status || incoming.status,
+            rating: Number(existing.rating) || 0,
+            favorite: existing.favorite === true,
+            notes: existing.notes || "",
+            prompt: existing.prompt || "",
+            addedAt: existing.addedAt || incoming.addedAt,
+            duration: existing.duration || incoming.duration,
+            width: existing.width || incoming.width,
+            height: existing.height || incoming.height,
+            handle: incoming.handle || existing.handle || null
+          };
+        }
+
+        function extensionOf(name) {
+          const parts = String(name || "").split(".");
+          return parts.length > 1 ? parts.pop().toLowerCase() : "";
+        }
+
+        function isVideoFile(fileOrName) {
+          const name = typeof fileOrName === "string" ? fileOrName : fileOrName.name;
+          return VIDEO_EXTENSIONS.has(extensionOf(name));
+        }
+
+        function cleanTitle(name) {
+          const withoutExt = String(name || "").replace(/\.[a-z0-9]+$/i, "");
+          return withoutExt
+            .replace(/user-[a-zA-Z0-9]+_/g, "")
+            .replace(/gen_[a-z0-9]+/gi, "")
+            .replace(/s_[a-z0-9]+/gi, "")
+            .replace(/watermarked_cleaned/gi, "cleaned")
+            .replace(/[_-]+/g, " ")
+            .replace(/\s+/g, " ")
+            .trim()
+            .replace(/^item\./i, "")
+            .replace(/\b\w/g, (letter) => letter.toUpperCase()) || "Untitled video";
+        }
+
+        function inferType(name, path) {
+          const text = `${name} ${path}`.toLowerCase();
+          const tests = [
+            ["Watermarks", ["watermark", "sora watermarks", "wm -"]],
+            ["Cleaned", ["cleaned", "no watermark"]],
+            ["Liminal", ["liminal", "backroom", "poolroom", "dreamcore", "weirdcore", "mall", "thrift", "suburban"]],
+            ["Analog/VHS", ["vhs", "analog", "1970", "1980", "1975", "1985", "camcorder", "crt"]],
+            ["Horror", ["horror", "haunted", "creepy", "monster", "scary", "nightmare", "eerie"]],
+            ["Sci-Fi", ["alien", "ufo", "space", "sci fi", "sci-fi", "cyber", "robot", "mars"]],
+            ["Architecture", ["architecture", "interior", "living room", "house", "room", "stairs", "building", "domestic"]],
+            ["Characters", ["portrait", "woman", "man", "girl", "boy", "character", "person", "people", "face"]],
+            ["Fashion", ["fashion", "outfit", "runway", "dress", "style", "wardrobe"]],
+            ["Animals", ["cat", "dog", "gorilla", "animal", "octopus", "bird"]],
+            ["Performance", ["music", "song", "concert", "performance", "dance", "show"]],
+            ["Nature", ["forest", "ocean", "river", "mountain", "garden", "nature"]],
+            ["Surreal", ["surreal", "impossible", "dream", "strange", "abstract"]]
+          ];
+          for (const [type, words] of tests) {
+            if (words.some((word) => text.includes(word))) return type;
+          }
+          return "Uncategorized";
+        }
+
+        function inferTags(name, path) {
+          const text = `${name} ${path}`.toLowerCase();
+          const tags = new Set();
+          const pairs = [
+            ["sora", "sora"],
+            ["cleaned", "cleaned"],
+            ["watermark", "watermark"],
+            ["vhs", "vhs"],
+            ["liminal", "liminal"],
+            ["backrooms", "backroom"],
+            ["draft", "draft"],
+            ["generated", "generated_video"],
+            ["portrait", "portrait"],
+            ["alien", "alien"],
+            ["interior", "interior"]
+          ];
+          for (const [tag, needle] of pairs) {
+            if (text.includes(needle)) tags.add(tag);
+          }
+          return [...tags].slice(0, 4);
+        }
+
+        function hashString(input) {
+          let hash = 2166136261;
+          for (let index = 0; index < input.length; index += 1) {
+            hash ^= input.charCodeAt(index);
+            hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
+          }
+          return `v_${(hash >>> 0).toString(36)}_${Math.abs(input.length).toString(36)}`;
+        }
+
+        function fileToRecord(file, relativePath = "", handle = null, source = "manual import") {
+          const path = relativePath || file.webkitRelativePath || file.name;
+          return normalizeVideo({
+            id: hashString(`${path}|${file.size}|${file.lastModified}`),
+            name: file.name,
+            path,
+            source,
+            ext: extensionOf(file.name),
+            size: file.size,
+            modified: file.lastModified,
+            handle
+          });
+        }
+
+        async function importFiles(files, source = "manual import") {
+          const videos = [...files].filter(isVideoFile);
+          if (!videos.length) {
+            showToast("No supported video files found.");
+            return;
+          }
+          setBusy(true, "Importing files", 0, videos.length);
+          const existing = new Map(state.videos.map((video) => [video.id, video]));
+          const incoming = [];
+          for (let index = 0; index < videos.length; index += 1) {
+            const file = videos[index];
+            const record = fileToRecord(file, file.webkitRelativePath || file.name, null, source);
+            fileCache.set(record.id, file);
+            incoming.push(mergeVideo(existing.get(record.id), record));
+            if (index % 20 === 0) setBusy(true, "Importing files", index + 1, videos.length);
+          }
+          await commitImported(incoming, `${incoming.length} videos imported.`);
+        }
+
+        async function importFolder() {
+          if (!("showDirectoryPicker" in window)) {
+            els.folderInput.click();
+            return;
+          }
+          try {
+            const root = await window.showDirectoryPicker({ mode: "read", startIn: "videos" });
+            await scanDirectoryHandle(root);
+          } catch (error) {
+            if (error?.name !== "AbortError") {
+              console.error(error);
+              showToast("Folder import failed. Try the fallback picker.");
+            }
+          }
+        }
+
+        async function scanDirectoryHandle(rootHandle) {
+          const existing = new Map(state.videos.map((video) => [video.id, video]));
+          const records = [];
+          let scanned = 0;
+          setBusy(true, `Scanning ${rootHandle.name}`, 0, 0);
+
+          async function walk(dirHandle, prefix) {
+            for await (const entry of dirHandle.values()) {
+              if (entry.kind === "directory") {
+                await walk(entry, `${prefix}${entry.name}/`);
+                continue;
+              }
+              if (!isVideoFile(entry.name)) continue;
+              const file = await entry.getFile();
+              const relativePath = `${prefix}${entry.name}`;
+              const record = fileToRecord(file, relativePath, entry, rootHandle.name);
+              records.push(mergeVideo(existing.get(record.id), record));
+              scanned += 1;
+              if (scanned % 25 === 0) setBusy(true, `Scanning ${rootHandle.name}`, scanned, 0);
+            }
+          }
+
+          await walk(rootHandle, "");
+          await commitImported(records, `${records.length} videos indexed from ${rootHandle.name}.`);
+        }
+
+        async function commitImported(records, message) {
+          const nextMap = new Map(state.videos.map((video) => [video.id, video]));
+          for (const record of records) nextMap.set(record.id, record);
+          state.videos = [...nextMap.values()];
+          await persistVideos(records);
+          state.selectedId ||= records[0]?.id || "";
+          setBusy(false);
+          state.page = 1;
+          render();
+          await saveSettings();
+          showToast(message);
+        }
+
+        function setBusy(active, label = "", current = 0, total = 0) {
+          state.busy = active;
+          els.importFolder.disabled = active;
+          els.importFiles.disabled = active;
+          els.importDetected.disabled = active;
+          els.progress.classList.toggle("is-visible", active);
+          if (!active) return;
+          els.progressLabel.textContent = label;
+          els.progressCount.textContent = total ? `${current.toLocaleString()} / ${total.toLocaleString()}` : `${current.toLocaleString()} found`;
+          els.progressBar.style.width = total ? `${Math.min(100, Math.round((current / total) * 100))}%` : "100%";
+        }
+
+        function getFilteredVideos() {
+          const query = state.query.trim().toLowerCase();
+          let rows = state.videos.filter((video) => {
+            if (state.smart === "favorites" && !video.favorite) return false;
+            if (state.smart === "review" && video.status !== "review") return false;
+            if (state.smart === "untagged" && video.tags.length > 0) return false;
+            if (state.smart === "no-type" && video.type !== "Uncategorized") return false;
+            if (state.smart === "recent") {
+              const added = new Date(video.addedAt).getTime();
+              if (Date.now() - added > 1000 * 60 * 60 * 24 * 14) return false;
+            }
+            if (state.type !== "all" && video.type !== state.type) return false;
+            if (state.tag !== "all" && !video.tags.includes(state.tag)) return false;
+            if (state.status !== "all" && video.status !== state.status) return false;
+            if (!query) return true;
+            return [
+              video.title,
+              video.name,
+              video.type,
+              video.status,
+              video.tags.join(" "),
+              video.prompt,
+              video.notes,
+              video.source,
+              video.path
+            ].join(" ").toLowerCase().includes(query);
+          });
+
+          rows = rows.sort((a, b) => {
+            switch (state.sort) {
+              case "modified-asc":
+                return a.modified - b.modified;
+              case "added-desc":
+                return new Date(b.addedAt) - new Date(a.addedAt);
+              case "title-asc":
+                return a.title.localeCompare(b.title);
+              case "size-desc":
+                return b.size - a.size;
+              case "rating-desc":
+                return b.rating - a.rating || a.title.localeCompare(b.title);
+              default:
+                return b.modified - a.modified;
+            }
+          });
+          return rows;
+        }
+
+        function render() {
+          if (renderQueued) return;
+          renderQueued = true;
+          requestAnimationFrame(() => {
+            renderQueued = false;
+            const filtered = getFilteredVideos();
+            const maxPage = Math.max(1, Math.ceil(filtered.length / state.pageSize));
+            state.page = Math.min(Math.max(1, state.page), maxPage);
+            const start = (state.page - 1) * state.pageSize;
+            const pageRows = filtered.slice(start, start + state.pageSize);
+            if (!state.selectedId || !state.videos.some((video) => video.id === state.selectedId)) {
+              state.selectedId = filtered[0]?.id || state.videos[0]?.id || "";
+            }
+
+            syncControls();
+            renderStats(filtered);
+            renderNav();
+            renderBulkControls(pageRows);
+            renderResults(pageRows, filtered.length, maxPage);
+            renderInspector();
+          });
+        }
+
+        function syncControls() {
+          els.search.value = state.query;
+          els.sort.value = state.sort;
+          els.statusFilter.value = state.status;
+          els.pageSize.value = String(state.pageSize);
+          els.gridView.classList.toggle("is-active", state.view === "grid");
+          els.listView.classList.toggle("is-active", state.view === "list");
+          els.subtitle.textContent = state.videos.length ? `${state.videos.length.toLocaleString()} cataloged videos` : "Local video catalog";
+          syncAiControls();
+        }
+
+        function renderStats(filtered) {
+          const total = state.videos.length;
+          const bytes = state.videos.reduce((sum, video) => sum + video.size, 0);
+          const typed = total ? Math.round((state.videos.filter((video) => video.type && video.type !== "Uncategorized").length / total) * 100) : 0;
+          const favorites = state.videos.filter((video) => video.favorite).length;
+          els.statTotal.textContent = total.toLocaleString();
+          els.statVisible.textContent = filtered.length.toLocaleString();
+          els.statSize.textContent = formatBytes(bytes);
+          els.statTyped.textContent = `${typed}%`;
+          els.statFavorites.textContent = favorites.toLocaleString();
+        }
+
+        function renderNav() {
+          const smartItems = [
+            ["all", "All videos", state.videos.length, iconSvg("library")],
+            ["favorites", "Favorites", state.videos.filter((v) => v.favorite).length, iconSvg("star")],
+            ["review", "Needs review", state.videos.filter((v) => v.status === "review").length, iconSvg("review")],
+            ["untagged", "Untagged", state.videos.filter((v) => v.tags.length === 0).length, iconSvg("tag")],
+            ["no-type", "No type", state.videos.filter((v) => v.type === "Uncategorized").length, iconSvg("folder")],
+            ["recent", "Recently added", state.videos.filter((v) => Date.now() - new Date(v.addedAt).getTime() <= 1000 * 60 * 60 * 24 * 14).length, iconSvg("clock")]
+          ];
+          els.smartNav.innerHTML = smartItems.map(([id, label, count, icon]) => navButton("smart", id, label, count, icon, state.smart === id)).join("");
+
+          const typeCounts = countBy(state.videos, (video) => video.type || "Uncategorized");
+          const allTypes = [...new Set([...DEFAULT_TYPES, ...typeCounts.keys()])].filter(Boolean);
+          const typeRows = [["all", "All types", state.videos.length], ...allTypes.map((type) => [type, type, typeCounts.get(type) || 0])].filter((row) => row[0] === "all" || row[2] > 0 || DEFAULT_TYPES.includes(row[0]));
+          els.typeNav.innerHTML = typeRows.map(([id, label, count]) => navButton("type", id, label, count, iconSvg("dot"), state.type === id)).join("");
+
+          const tagCounts = countTags();
+          const tagRows = [["all", "All tags", state.videos.length], ...[...tagCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 20)];
+          els.tagNav.innerHTML = tagRows.map(([id, countOrLabel, maybeCount]) => {
+            const label = id === "all" ? countOrLabel : `#${id}`;
+            const count = id === "all" ? maybeCount : countOrLabel;
+            return navButton("tag", id, label, count, iconSvg("tag"), state.tag === id);
+          }).join("");
+
+          els.bulkType.innerHTML = [...new Set([...DEFAULT_TYPES, ...typeCounts.keys()])].filter(Boolean).map((type) => `<option value="${escapeAttr(type)}">${escapeHtml(type)}</option>`).join("");
+        }
+
+        function navButton(group, id, label, count, icon, active) {
+          return `
+            <button class="nav-item ${active ? "is-active" : ""}" type="button" data-nav-group="${group}" data-nav-id="${escapeAttr(id)}">
+              ${icon}
+              <span>${escapeHtml(label)}</span>
+              <span class="nav-count">${Number(count || 0).toLocaleString()}</span>
+            </button>
+          `;
+        }
+
+        function renderBulkControls(pageRows) {
+          const selectedCount = state.batch.size;
+          els.bulkbar.hidden = selectedCount === 0;
+          els.bulkCount.textContent = `${selectedCount.toLocaleString()} selected`;
+          els.selectPage.disabled = pageRows.length === 0;
+          els.clearSelection.disabled = selectedCount === 0;
+        }
+
+        function renderResults(pageRows, filteredCount, maxPage) {
+          if (!state.videos.length) {
+            els.results.innerHTML = `
+              <div class="empty">
+                ${iconSvg("film", 56)}
+                <h2>Import your Sora library folder.</h2>
+                <p>The catalog is built for a few thousand videos: folder import, type filters, tags, favorites, preview, notes, backup JSON, and CSV export.</p>
+                <div class="actions">
+                  <button class="btn btn-primary" type="button" data-action="import-folder">Import Folder</button>
+                  <button class="btn btn-secondary" type="button" data-action="import-files">Import Files</button>
+                </div>
+              </div>
+            `;
+            els.pagination.innerHTML = "";
+            return;
+          }
+
+          if (!pageRows.length) {
+            els.results.innerHTML = `
+              <div class="empty">
+                ${iconSvg("search", 52)}
+                <h2>No videos match this filter.</h2>
+                <p>Clear search, switch type, or return to all videos.</p>
+                <button class="btn btn-secondary" type="button" data-action="clear-filters">Clear Filters</button>
+              </div>
+            `;
+          } else if (state.view === "list") {
+            els.results.innerHTML = `<div class="list">${pageRows.map(renderListRow).join("")}</div>`;
+          } else {
+            els.results.innerHTML = `<div class="grid">${pageRows.map(renderCard).join("")}</div>`;
+            hydrateThumbnails(pageRows);
+          }
+
+          const start = filteredCount ? (state.page - 1) * state.pageSize + 1 : 0;
+          const end = Math.min(filteredCount, state.page * state.pageSize);
+          els.pagination.innerHTML = `
+            <span>${start.toLocaleString()}-${end.toLocaleString()} of ${filteredCount.toLocaleString()} visible</span>
+            <div class="pagination">
+              <button class="btn btn-secondary" type="button" data-page="prev" ${state.page <= 1 ? "disabled" : ""}>Previous</button>
+              <span>Page ${state.page.toLocaleString()} / ${maxPage.toLocaleString()}</span>
+              <button class="btn btn-secondary" type="button" data-page="next" ${state.page >= maxPage ? "disabled" : ""}>Next</button>
+            </div>
+          `;
+        }
+
+        function renderCard(video) {
+          const selected = video.id === state.selectedId;
+          const checked = state.batch.has(video.id);
+          const tags = video.tags.slice(0, 3).map((tag) => `<span class="tag">#${escapeHtml(tag)}</span>`).join("");
+          return `
+            <article class="card ${selected ? "is-selected" : ""}" data-video-id="${escapeAttr(video.id)}">
+              <input class="card-check" type="checkbox" aria-label="Select ${escapeAttr(video.title)}" data-batch-id="${escapeAttr(video.id)}" ${checked ? "checked" : ""} />
+              <div class="thumb" data-thumb-id="${escapeAttr(video.id)}">
+                <div class="thumb-fallback">${iconSvg("film", 28)}<span>${escapeHtml(video.ext || "video")}</span></div>
+                <div class="badge-row">
+                  <span class="badge type">${escapeHtml(video.type || "Uncategorized")}</span>
+                  ${video.favorite ? `<span class="badge">${iconSvg("star", 12)} Fav</span>` : ""}
+                </div>
+              </div>
+              <div class="card-body">
+                <h3 class="card-title">${escapeHtml(video.title)}</h3>
+                <div class="meta-row">
+                  <span>${formatDate(video.modified)}</span>
+                  <span>${formatBytes(video.size)}</span>
+                </div>
+                <div class="tag-row">${tags || `<span class="tag">${escapeHtml(STATUS_LABELS[video.status] || video.status)}</span>`}</div>
+              </div>
+            </article>
+          `;
+        }
+
+        function renderListRow(video) {
+          return `
+            <div class="row ${video.id === state.selectedId ? "is-selected" : ""}" data-video-id="${escapeAttr(video.id)}">
+              <input type="checkbox" aria-label="Select ${escapeAttr(video.title)}" data-batch-id="${escapeAttr(video.id)}" ${state.batch.has(video.id) ? "checked" : ""} />
+              <div class="row-title">
+                <strong>${escapeHtml(video.title)}</strong>
+                <span>${escapeHtml(video.path)}</span>
+              </div>
+              <span class="tag">${escapeHtml(video.type || "Uncategorized")}</span>
+              <span>${escapeHtml(STATUS_LABELS[video.status] || video.status)}</span>
+              <span>${formatBytes(video.size)}</span>
+              <span>${formatDate(video.modified)}</span>
+            </div>
+          `;
+        }
+
+        async function hydrateThumbnails(pageRows) {
+          for (const video of pageRows.slice(0, 96)) {
+            const thumb = els.results.querySelector(`[data-thumb-id="${cssEscape(video.id)}"]`);
+            if (!thumb) continue;
+            const token = {};
+            pendingThumbs.set(thumb, token);
+            const url = await getObjectUrl(video);
+            if (!url || pendingThumbs.get(thumb) !== token) continue;
+            thumb.insertAdjacentHTML("afterbegin", `<video muted playsinline preload="metadata" src="${escapeAttr(url)}"></video>`);
+          }
+        }
+
+        async function renderInspector() {
+          const requestedId = state.selectedId;
+          const video = state.videos.find((item) => item.id === requestedId);
+          if (!video) {
+            els.inspector.innerHTML = `
+              <div class="inspector-empty">
+                ${iconSvg("panel", 48)}
+                <p>Select a video to preview and edit metadata.</p>
+              </div>
+            `;
+            return;
+          }
+
+          const url = await getObjectUrl(video);
+          if (state.selectedId !== requestedId) return;
+          const tagText = video.tags.join(", ");
+          els.inspector.innerHTML = `
+            <div class="preview">
+              ${url ? `<video controls playsinline preload="metadata" src="${escapeAttr(url)}"></video>` : `
+                <div class="preview-missing">
+                  ${iconSvg("unlink", 38)}
+                  <strong>File handle not connected</strong>
+                  <span>Re-import the folder or drag the file in to preview it again.</span>
+                </div>
+              `}
+            </div>
+            <div class="inspector-head">
+              <h2>${escapeHtml(video.title)}</h2>
+              <button class="icon-btn fav ${video.favorite ? "is-on" : ""}" type="button" data-inspector-action="favorite" title="Favorite" aria-label="Favorite">
+                ${iconSvg("star", 18)}
+              </button>
+            </div>
+            <div class="form">
+              <label>Title
+                <input class="field" data-field="title" value="${escapeAttr(video.title)}" />
+              </label>
+              <div class="two-col">
+                <label>Type
+                  <input class="field" list="type-options" data-field="type" value="${escapeAttr(video.type || "Uncategorized")}" />
+                </label>
+                <label>Status
+                  <select class="select" data-field="status">
+                    ${Object.entries(STATUS_LABELS).map(([value, label]) => `<option value="${value}" ${video.status === value ? "selected" : ""}>${label}</option>`).join("")}
+                  </select>
+                </label>
+              </div>
+              <div class="two-col">
+                <label>Rating
+                  <select class="select" data-field="rating">
+                    ${[0, 1, 2, 3, 4, 5].map((value) => `<option value="${value}" ${Number(video.rating) === value ? "selected" : ""}>${value ? "★".repeat(value) : "Unrated"}</option>`).join("")}
+                  </select>
+                </label>
+                <label>Source
+                  <input class="field" data-field="source" value="${escapeAttr(video.source || "")}" />
+                </label>
+              </div>
+              <label>Tags
+                <input class="field" data-field="tags" value="${escapeAttr(tagText)}" placeholder="liminal, vhs, keeper" />
+              </label>
+              <label>Prompt
+                <textarea class="textarea" data-field="prompt" placeholder="Paste or summarize the Sora prompt">${escapeHtml(video.prompt || "")}</textarea>
+              </label>
+              <label>Notes
+                <textarea class="textarea" data-field="notes" placeholder="Use, scene notes, edits needed, client/project">${escapeHtml(video.notes || "")}</textarea>
+              </label>
+              <div class="path-line">
+                ${escapeHtml(video.path)}<br />
+                ${formatBytes(video.size)} · ${formatDate(video.modified)} · ${escapeHtml(video.ext.toUpperCase())}
+              </div>
+              <button class="btn btn-danger" type="button" data-inspector-action="remove">Remove From Catalog</button>
+            </div>
+            <datalist id="type-options">
+              ${[...new Set([...DEFAULT_TYPES, ...state.videos.map((item) => item.type).filter(Boolean)])].map((type) => `<option value="${escapeAttr(type)}"></option>`).join("")}
+            </datalist>
+          `;
+        }
+
+        async function getObjectUrl(video) {
+          if (urlCache.has(video.id)) return urlCache.get(video.id);
+          let file = fileCache.get(video.id);
+          if (!file && video.handle) {
+            try {
+              const permission = await queryHandlePermission(video.handle);
+              if (permission) file = await video.handle.getFile();
+            } catch (error) {
+              console.warn("Could not read file handle", error);
+            }
+          }
+          if (!file) return "";
+          const url = URL.createObjectURL(file);
+          urlCache.set(video.id, url);
+          if (urlCache.size > 160) {
+            const [firstId, firstUrl] = urlCache.entries().next().value;
+            URL.revokeObjectURL(firstUrl);
+            urlCache.delete(firstId);
+          }
+          return url;
+        }
+
+        async function queryHandlePermission(handle) {
+          if (!handle?.queryPermission) return true;
+          const options = { mode: "read" };
+          const current = await handle.queryPermission(options);
+          if (current === "granted") return true;
+          if (!handle.requestPermission) return false;
+          return (await handle.requestPermission(options)) === "granted";
+        }
+
+        async function updateVideo(id, patch, options = {}) {
+          const shouldRender = options.render !== false;
+          const index = state.videos.findIndex((video) => video.id === id);
+          if (index < 0) return;
+          const next = normalizeVideo({ ...state.videos[index], ...patch });
+          state.videos.splice(index, 1, next);
+          await persistVideos([next]);
+          if (shouldRender) render();
+          await saveSettings();
+        }
+
+        async function bulkPatch(ids, patch) {
+          const idSet = new Set(ids);
+          const updated = [];
+          state.videos = state.videos.map((video) => {
+            if (!idSet.has(video.id)) return video;
+            const next = normalizeVideo({ ...video, ...patch });
+            updated.push(next);
+            return next;
+          });
+          await persistVideos(updated);
+          render();
+          showToast(`${updated.length.toLocaleString()} videos updated.`);
+        }
+
+        async function removeVideos(ids) {
+          const idSet = new Set(ids);
+          state.videos = state.videos.filter((video) => !idSet.has(video.id));
+          for (const id of idSet) {
+            state.batch.delete(id);
+            fileCache.delete(id);
+            if (urlCache.has(id)) {
+              URL.revokeObjectURL(urlCache.get(id));
+              urlCache.delete(id);
+            }
+          }
+          if (idSet.has(state.selectedId)) state.selectedId = state.videos[0]?.id || "";
+          await dbDeleteMany("videos", [...idSet]);
+          render();
+          await saveSettings();
+          showToast(`${idSet.size.toLocaleString()} videos removed from catalog.`);
+        }
+
+        function exportJson() {
+          const payload = {
+            app: "Sora Library",
+            exportedAt: new Date().toISOString(),
+            count: state.videos.length,
+            videos: state.videos.map(({ handle, ...video }) => video)
+          };
+          downloadBlob(JSON.stringify(payload, null, 2), "sora-library-backup.json", "application/json");
+        }
+
+        function exportCsv() {
+          const headers = ["title", "type", "tags", "status", "rating", "favorite", "size", "modified", "source", "path", "prompt", "notes"];
+          const lines = [
+            headers.join(","),
+            ...state.videos.map((video) => headers.map((key) => csvCell(key === "tags" ? video.tags.join("|") : video[key])).join(","))
+          ];
+          downloadBlob(lines.join("\n"), "sora-library.csv", "text/csv");
+        }
+
+        async function importBackup(file) {
+          try {
+            const text = await file.text();
+            const payload = JSON.parse(text);
+            const rows = Array.isArray(payload.videos) ? payload.videos : Array.isArray(payload) ? payload : [];
+            const existing = new Map(state.videos.map((video) => [video.id, video]));
+            const imported = rows.map((row) => mergeVideo(existing.get(row.id), normalizeVideo(row)));
+            await commitImported(imported, `${imported.length.toLocaleString()} backup records restored.`);
+          } catch (error) {
+            console.error(error);
+            showToast("Backup restore failed. The JSON did not look like a Sora Library backup.");
+          }
+        }
+
+        function downloadBlob(content, name, type) {
+          const blob = new Blob([content], { type });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = name;
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+        }
+
+        function csvCell(value) {
+          const text = String(value ?? "");
+          return `"${text.replaceAll('"', '""')}"`;
+        }
+
+        function countBy(rows, getter) {
+          const map = new Map();
+          for (const row of rows) {
+            const key = getter(row);
+            map.set(key, (map.get(key) || 0) + 1);
+          }
+          return map;
+        }
+
+        function countTags() {
+          const map = new Map();
+          for (const video of state.videos) {
+            for (const tag of video.tags) map.set(tag, (map.get(tag) || 0) + 1);
+          }
+          return map;
+        }
+
+        function formatBytes(bytes) {
+          const value = Number(bytes) || 0;
+          if (value >= 1024 ** 4) return `${(value / 1024 ** 4).toFixed(1)} TB`;
+          if (value >= 1024 ** 3) return `${(value / 1024 ** 3).toFixed(1)} GB`;
+          if (value >= 1024 ** 2) return `${(value / 1024 ** 2).toFixed(1)} MB`;
+          if (value >= 1024) return `${(value / 1024).toFixed(1)} KB`;
+          return `${value} B`;
+        }
+
+        function formatDate(timestamp) {
+          const value = Number(timestamp);
+          if (!value) return "Unknown";
+          return new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric" }).format(new Date(value));
+        }
+
+        function escapeHtml(value) {
+          return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+          })[char]);
+        }
+
+        function escapeAttr(value) {
+          return escapeHtml(value).replace(/`/g, "&#96;");
+        }
+
+        function cssEscape(value) {
+          if (window.CSS?.escape) return CSS.escape(value);
+          return String(value).replace(/[^a-zA-Z0-9_-]/g, "\\$&");
+        }
+
+        function showToast(message) {
+          clearTimeout(toastTimer);
+          els.toast.textContent = message;
+          els.toast.classList.add("is-visible");
+          toastTimer = setTimeout(() => els.toast.classList.remove("is-visible"), 3200);
+        }
+
+        function iconSvg(name, size = 18) {
+          const attrs = `viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"`;
+          const icons = {
+            library: `<path d="M4 4h16v16H4z" /><path d="M8 4v16" /><path d="M16 4v16" />`,
+            star: `<path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1L12 16.9 6.6 19.8l1-6.1-4.4-4.3 6.1-.9Z" />`,
+            review: `<path d="M4 5h16" /><path d="M4 12h11" /><path d="M4 19h7" /><path d="m17 16 2 2 4-5" />`,
+            tag: `<path d="M20 13 11 4H4v7l9 9a2 2 0 0 0 2.8 0l4.2-4.2a2 2 0 0 0 0-2.8Z" /><path d="M7.5 7.5h.01" />`,
+            folder: `<path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" />`,
+            clock: `<circle cx="12" cy="12" r="9" /><path d="M12 7v6l4 2" />`,
+            dot: `<circle cx="12" cy="12" r="3" fill="currentColor" stroke="none" />`,
+            film: `<path d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z" /><path d="M8 3v18M16 3v18M4 8h4M4 16h4M16 8h4M16 16h4" />`,
+            search: `<circle cx="11" cy="11" r="7" /><path d="m20 20-3.6-3.6" />`,
+            panel: `<path d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z" /><path d="M14 3v18" />`,
+            unlink: `<path d="M10 13a5 5 0 0 0 7.1 0l1.4-1.4a5 5 0 0 0-7.1-7.1L10.5 5.4" /><path d="M14 11a5 5 0 0 0-7.1 0l-1.4 1.4a5 5 0 0 0 7.1 7.1l.9-.9" /><path d="m4 4 16 16" />`
+          };
+          return `<svg ${attrs}>${icons[name] || icons.dot}</svg>`;
+        }
+
+        function syncAiControls() {
+          els.aiProvider.value = state.ai.provider;
+          els.aiTask.value = state.ai.task;
+          els.aiMaxItems.value = String(state.ai.maxItems || 12);
+          els.aiOllamaUrl.value = state.ai.ollamaUrl || "http://127.0.0.1:11434";
+          els.aiOllamaModel.value = state.ai.ollamaModel || "llava:latest";
+          els.aiGeminiKey.value = state.ai.geminiKey || "";
+          els.aiGeminiModel.value = state.ai.geminiModel || "gemini-2.5-flash";
+          els.aiWebhookUrl.value = state.ai.webhookUrl || "";
+          els.aiInstruction.value = state.ai.instruction || "";
+        }
+
+        function readAiControls() {
+          state.ai = {
+            provider: els.aiProvider.value,
+            task: els.aiTask.value,
+            maxItems: Math.max(1, Math.min(200, Number(els.aiMaxItems.value) || 12)),
+            ollamaUrl: els.aiOllamaUrl.value.trim() || "http://127.0.0.1:11434",
+            ollamaModel: els.aiOllamaModel.value.trim() || "llava:latest",
+            geminiKey: els.aiGeminiKey.value.trim(),
+            geminiModel: els.aiGeminiModel.value.trim() || "gemini-2.5-flash",
+            webhookUrl: els.aiWebhookUrl.value.trim(),
+            instruction: els.aiInstruction.value.trim()
+          };
+          syncAiControls();
+          saveSettings();
+          return state.ai;
+        }
+
+        function openAiStudio() {
+          syncAiControls();
+          els.aiModal.classList.add("is-open");
+        }
+
+        function closeAiStudio() {
+          els.aiModal.classList.remove("is-open");
+        }
+
+        function setAiStatus(message, current = 0, total = 0) {
+          els.aiStatus.textContent = message;
+          els.aiMeter.style.width = total ? `${Math.min(100, Math.round((current / total) * 100))}%` : "0%";
+        }
+
+        function setAiLog(lines) {
+          els.aiLog.textContent = Array.isArray(lines) ? lines.join("\n") : String(lines || "");
+        }
+
+        function getAiTargets(scope) {
+          if (scope === "selected" && state.batch.size) {
+            const selected = new Set(state.batch);
+            return state.videos.filter((video) => selected.has(video.id)).slice(0, state.ai.maxItems);
+          }
+          const current = state.videos.find((video) => video.id === state.selectedId);
+          return current ? [current] : [];
+        }
+
+        async function runAiWorkflow(scope) {
+          const config = readAiControls();
+          const targets = getAiTargets(scope);
+          if (!targets.length) {
+            showToast("Select or open a video before running AI.");
+            return;
+          }
+          const logs = [];
+          setAiLog("");
+          setAiStatus(`Running ${config.provider} on ${targets.length.toLocaleString()} video${targets.length === 1 ? "" : "s"}...`, 0, targets.length);
+          toggleAiButtons(true);
+          try {
+            for (let index = 0; index < targets.length; index += 1) {
+              const video = targets[index];
+              setAiStatus(`Analyzing ${video.title}`, index, targets.length);
+              const result = await generateAiMetadata(video, config);
+              const patch = coerceAiPatch(result, config.task);
+              await updateVideo(video.id, patch, { render: false });
+              logs.push(formatAiResult(video, patch));
+              setAiLog(logs);
+              setAiStatus(`Analyzed ${index + 1} of ${targets.length}`, index + 1, targets.length);
+            }
+            render();
+            showToast("AI workflow complete.");
+          } catch (error) {
+            console.error(error);
+            logs.push(`ERROR: ${error.message || String(error)}`);
+            setAiLog(logs);
+            showToast("AI workflow stopped. Check AI Studio for details.");
+          } finally {
+            toggleAiButtons(false);
+          }
+        }
+
+        function toggleAiButtons(disabled) {
+          els.aiRunCurrent.disabled = disabled;
+          els.aiRunSelected.disabled = disabled;
+          els.aiCopyBundle.disabled = disabled;
+          els.aiSaveSettings.disabled = disabled;
+        }
+
+        async function generateAiMetadata(video, config) {
+          if (config.provider === "prompt-only") return localPromptOnly(video, config);
+          const frame = await captureVideoFrame(video).catch((error) => {
+            console.warn("Frame capture failed", error);
+            return null;
+          });
+          const bundle = buildAgentBundle([video], config, frame);
+          if (config.provider === "ollama") return callOllama(bundle, config);
+          if (config.provider === "gemini") return callGemini(bundle, config);
+          if (config.provider === "webhook") return callWebhook(bundle, config);
+          return localPromptOnly(video, config);
+        }
+
+        function buildAgentBundle(videos, config, frame = null) {
+          const safeVideos = videos.map((video) => ({
+            id: video.id,
+            title: video.title,
+            name: video.name,
+            type: video.type,
+            tags: video.tags,
+            status: video.status,
+            rating: video.rating,
+            favorite: video.favorite,
+            prompt: video.prompt,
+            notes: video.notes,
+            source: video.source,
+            path: video.path,
+            ext: video.ext,
+            size: video.size,
+            modified: video.modified
+          }));
+          return {
+            app: "Sora Library",
+            task: config.task,
+            instruction: config.instruction,
+            expected_json: {
+              title: "short library title",
+              type: "one concise library category",
+              tags: ["3-8 lowercase tags"],
+              prompt: "reusable Sora generation prompt",
+              notes: "short organization note",
+              status: "review | keeper | needs-edit | archived | uncategorized",
+              rating: "0-5 optional number"
+            },
+            videos: safeVideos,
+            frame
+          };
+        }
+
+        async function copyAgentBundle() {
+          const config = readAiControls();
+          const targets = getAiTargets("selected");
+          if (!targets.length) {
+            showToast("Select or open a video before copying an agent bundle.");
+            return;
+          }
+          const frame = targets.length === 1 ? await captureVideoFrame(targets[0]).catch(() => null) : null;
+          const bundle = buildAgentBundle(targets, config, frame);
+          await writeClipboard(JSON.stringify(bundle, null, 2));
+          setAiLog(`Copied ${targets.length.toLocaleString()} video record${targets.length === 1 ? "" : "s"} as an agent bundle.\n\nPaste this into Codex or send it to your own local agent endpoint.`);
+          showToast("Agent bundle copied.");
+        }
+
+        async function writeClipboard(text) {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+            return;
+          }
+          const textarea = document.createElement("textarea");
+          textarea.value = text;
+          textarea.style.position = "fixed";
+          textarea.style.opacity = "0";
+          document.body.appendChild(textarea);
+          textarea.select();
+          document.execCommand("copy");
+          textarea.remove();
+        }
+
+        async function callOllama(bundle, config) {
+          const prompt = agentPrompt(bundle);
+          const baseUrl = config.ollamaUrl.replace(/\/+$/, "");
+          const body = {
+            model: config.ollamaModel,
+            stream: false,
+            messages: [
+              {
+                role: "user",
+                content: prompt,
+                images: bundle.frame?.base64 ? [bundle.frame.base64] : undefined
+              }
+            ],
+            format: "json",
+            options: { temperature: 0.2 }
+          };
+          const response = await fetch(`${baseUrl}/api/chat`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body)
+          });
+          if (!response.ok) throw new Error(`Ollama request failed with status ${response.status}.`);
+          const data = await response.json();
+          return parseAiJson(data.message?.content || data.response || JSON.stringify(data));
+        }
+
+        async function callGemini(bundle, config) {
+          if (!config.geminiKey) throw new Error("Gemini needs an API key.");
+          const parts = [{ text: agentPrompt(bundle) }];
+          if (bundle.frame?.base64) {
+            parts.push({ inline_data: { mime_type: bundle.frame.mimeType, data: bundle.frame.base64 } });
+          }
+          const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(config.geminiModel)}:generateContent?key=${encodeURIComponent(config.geminiKey)}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{ role: "user", parts }],
+              generationConfig: {
+                responseMimeType: "application/json",
+                temperature: 0.2
+              }
+            })
+          });
+          if (!response.ok) throw new Error(`Gemini request failed with status ${response.status}.`);
+          const data = await response.json();
+          const text = data.candidates?.[0]?.content?.parts?.map((part) => part.text || "").join("\n") || "";
+          return parseAiJson(text || JSON.stringify(data));
+        }
+
+        async function callWebhook(bundle, config) {
+          if (!config.webhookUrl) throw new Error("Agent webhook URL is empty.");
+          const response = await fetch(config.webhookUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(bundle)
+          });
+          if (!response.ok) throw new Error(`Webhook request failed with status ${response.status}.`);
+          return parseAiJson(await response.text());
+        }
+
+        function localPromptOnly(video, config) {
+          const tags = [...new Set([...video.tags, ...inferTags(video.name, video.path)])].slice(0, 8);
+          const type = video.type && video.type !== "Uncategorized" ? video.type : inferType(video.name, video.path);
+          const prompt = [
+            cleanTitle(video.title || video.name),
+            type !== "Uncategorized" ? `${type.toLowerCase()} visual style` : "",
+            tags.length ? `motifs: ${tags.join(", ")}` : "",
+            config.instruction || ""
+          ].filter(Boolean).join(". ");
+          return {
+            title: video.title || cleanTitle(video.name),
+            type,
+            tags,
+            prompt,
+            notes: "Generated locally from filename, path, and existing metadata.",
+            status: video.status || "review"
+          };
+        }
+
+        function agentPrompt(bundle) {
+          const video = bundle.videos[0];
+          return [
+            "You are organizing a personal Sora video library.",
+            "Analyze the provided video frame when present and the metadata below.",
+            "Return ONLY valid JSON. Do not wrap in markdown.",
+            "Use this schema: {\"title\":\"\",\"type\":\"\",\"tags\":[\"\"],\"prompt\":\"\",\"notes\":\"\",\"status\":\"review\",\"rating\":0}.",
+            "Valid statuses: review, keeper, needs-edit, archived, uncategorized.",
+            "Keep tags lowercase and useful for search. Keep type broad but specific enough for a video library.",
+            bundle.task === "prompt" ? "Prioritize reconstructing a reusable Sora-style generation prompt." : "",
+            bundle.task === "tags" ? "Only change title, type, tags, notes, and status. Keep prompt empty unless obvious." : "",
+            bundle.instruction ? `Extra instruction: ${bundle.instruction}` : "",
+            `Video metadata: ${JSON.stringify(video, null, 2)}`
+          ].filter(Boolean).join("\n");
+        }
+
+        async function captureVideoFrame(video) {
+          const url = await getObjectUrl(video);
+          if (!url) return null;
+          return new Promise((resolve, reject) => {
+            const media = document.createElement("video");
+            let resolved = false;
+            const cleanup = () => {
+              media.pause();
+              media.removeAttribute("src");
+              media.load();
+            };
+            const drawFrame = () => {
+              if (resolved) return;
+              resolved = true;
+              try {
+                const width = media.videoWidth || 768;
+                const height = media.videoHeight || 432;
+                const scale = Math.min(1, 768 / Math.max(width, height));
+                const canvas = document.createElement("canvas");
+                canvas.width = Math.max(1, Math.round(width * scale));
+                canvas.height = Math.max(1, Math.round(height * scale));
+                const context = canvas.getContext("2d");
+                context.drawImage(media, 0, 0, canvas.width, canvas.height);
+                const dataUrl = canvas.toDataURL("image/jpeg", 0.82);
+                cleanup();
+                resolve({
+                  mimeType: "image/jpeg",
+                  base64: dataUrl.split(",")[1],
+                  width: canvas.width,
+                  height: canvas.height
+                });
+              } catch (error) {
+                cleanup();
+                reject(error);
+              }
+            };
+            media.muted = true;
+            media.playsInline = true;
+            media.preload = "metadata";
+            media.src = url;
+            media.onloadedmetadata = () => {
+              const seekTarget = Number.isFinite(media.duration) && media.duration > 1 ? Math.min(1.2, media.duration / 3) : 0;
+              if (seekTarget > 0) media.currentTime = seekTarget;
+              else drawFrame();
+            };
+            media.onloadeddata = () => {
+              if (!Number.isFinite(media.duration) || media.duration <= 1) drawFrame();
+            };
+            media.onseeked = drawFrame;
+            media.onerror = () => {
+              cleanup();
+              reject(new Error("Could not load video frame."));
+            };
+          });
+        }
+
+        function parseAiJson(text) {
+          const raw = String(text || "").trim();
+          if (!raw) throw new Error("AI returned an empty response.");
+          try {
+            return JSON.parse(raw);
+          } catch (_) {
+            const match = raw.match(/\{[\s\S]*\}/);
+            if (match) return JSON.parse(match[0]);
+            throw new Error("AI response was not valid JSON.");
+          }
+        }
+
+        function coerceAiPatch(result, task) {
+          const source = Array.isArray(result) ? result[0] : result;
+          const allowedStatuses = new Set(Object.keys(STATUS_LABELS));
+          const patch = {};
+          if (source.title) patch.title = String(source.title).trim().slice(0, 160);
+          if (source.type) patch.type = String(source.type).trim().slice(0, 80);
+          if (Array.isArray(source.tags)) {
+            patch.tags = [...new Set(source.tags.map((tag) => String(tag).toLowerCase().replace(/^#/, "").trim()).filter(Boolean))].slice(0, 12);
+          }
+          if (source.prompt && task !== "tags") patch.prompt = String(source.prompt).trim().slice(0, 1800);
+          if (source.notes) patch.notes = String(source.notes).trim().slice(0, 1000);
+          if (source.status && allowedStatuses.has(source.status)) patch.status = source.status;
+          if (Number.isFinite(Number(source.rating))) patch.rating = Math.max(0, Math.min(5, Number(source.rating)));
+          return patch;
+        }
+
+        function formatAiResult(video, patch) {
+          return [
+            `Updated: ${video.title}`,
+            patch.title ? `  title: ${patch.title}` : "",
+            patch.type ? `  type: ${patch.type}` : "",
+            patch.tags ? `  tags: ${patch.tags.join(", ")}` : "",
+            patch.prompt ? `  prompt: ${patch.prompt.slice(0, 220)}${patch.prompt.length > 220 ? "..." : ""}` : "",
+            patch.notes ? `  notes: ${patch.notes}` : ""
+          ].filter(Boolean).join("\n");
+        }
+
+        function wireEvents() {
+          els.importFolder.addEventListener("click", importFolder);
+          els.importDetected.addEventListener("click", () => {
+            showToast(`Choose the folder named "library" inside ${DETECTED_PATH.replace("/library", "")}.`);
+            importFolder();
+          });
+          els.directoryFallback.addEventListener("click", () => els.folderInput.click());
+          els.importFiles.addEventListener("click", () => els.fileInput.click());
+          els.fileInput.addEventListener("change", () => {
+            importFiles(els.fileInput.files || [], "file import");
+            els.fileInput.value = "";
+          });
+          els.folderInput.addEventListener("change", () => {
+            importFiles(els.folderInput.files || [], "folder fallback");
+            els.folderInput.value = "";
+          });
+          els.exportJson.addEventListener("click", exportJson);
+          els.exportCsv.addEventListener("click", exportCsv);
+          els.importJson.addEventListener("click", () => els.jsonInput.click());
+          els.jsonInput.addEventListener("change", () => {
+            const [file] = els.jsonInput.files || [];
+            if (file) importBackup(file);
+            els.jsonInput.value = "";
+          });
+          els.aiStudio.addEventListener("click", openAiStudio);
+          els.aiClose.addEventListener("click", closeAiStudio);
+          els.aiCloseBottom.addEventListener("click", closeAiStudio);
+          els.aiModal.addEventListener("click", (event) => {
+            if (event.target === els.aiModal) closeAiStudio();
+          });
+          els.aiSaveSettings.addEventListener("click", () => {
+            readAiControls();
+            showToast("AI settings saved.");
+          });
+          els.aiRunCurrent.addEventListener("click", () => runAiWorkflow("current"));
+          els.aiRunSelected.addEventListener("click", () => runAiWorkflow("selected"));
+          els.aiCopyBundle.addEventListener("click", copyAgentBundle);
+
+          els.search.addEventListener("input", () => {
+            state.query = els.search.value;
+            state.page = 1;
+            render();
+            saveSettings();
+          });
+          els.sort.addEventListener("change", () => {
+            state.sort = els.sort.value;
+            render();
+            saveSettings();
+          });
+          els.statusFilter.addEventListener("change", () => {
+            state.status = els.statusFilter.value;
+            state.page = 1;
+            render();
+            saveSettings();
+          });
+          els.pageSize.addEventListener("change", () => {
+            state.pageSize = Number(els.pageSize.value) || 72;
+            state.page = 1;
+            render();
+            saveSettings();
+          });
+          els.gridView.addEventListener("click", () => {
+            state.view = "grid";
+            render();
+            saveSettings();
+          });
+          els.listView.addEventListener("click", () => {
+            state.view = "list";
+            render();
+            saveSettings();
+          });
+          els.selectPage.addEventListener("click", () => {
+            for (const video of getCurrentPageRows()) state.batch.add(video.id);
+            render();
+          });
+          els.clearSelection.addEventListener("click", () => {
+            state.batch.clear();
+            render();
+          });
+
+          document.addEventListener("click", handleClick);
+          document.addEventListener("change", handleChange);
+          document.addEventListener("input", handleInput);
+
+          els.dropZone.addEventListener("dragover", (event) => {
+            event.preventDefault();
+            els.dropZone.classList.add("is-dragging");
+          });
+          els.dropZone.addEventListener("dragleave", () => els.dropZone.classList.remove("is-dragging"));
+          els.dropZone.addEventListener("drop", async (event) => {
+            event.preventDefault();
+            els.dropZone.classList.remove("is-dragging");
+            const files = event.dataTransfer?.files;
+            if (files?.length) await importFiles(files, "drag and drop");
+          });
+        }
+
+        function handleClick(event) {
+          const nav = event.target.closest("[data-nav-group]");
+          if (nav) {
+            const group = nav.dataset.navGroup;
+            const id = nav.dataset.navId;
+            state[group] = id;
+            if (group === "smart" && id !== "all") {
+              state.type = "all";
+              state.tag = "all";
+            }
+            if (group === "type" && id !== "all") state.smart = "all";
+            if (group === "tag" && id !== "all") state.smart = "all";
+            state.page = 1;
+            render();
+            saveSettings();
+            return;
+          }
+
+          const action = event.target.closest("[data-action]")?.dataset.action;
+          if (action === "import-folder") importFolder();
+          if (action === "import-files") els.fileInput.click();
+          if (action === "clear-filters") {
+            Object.assign(state, { smart: "all", type: "all", tag: "all", status: "all", query: "", page: 1 });
+            render();
+            saveSettings();
+          }
+
+          const page = event.target.closest("[data-page]")?.dataset.page;
+          if (page) {
+            state.page += page === "next" ? 1 : -1;
+            els.scroll.scrollTop = 0;
+            render();
+            saveSettings();
+            return;
+          }
+
+          const card = event.target.closest("[data-video-id]");
+          if (card && !event.target.closest("[data-batch-id]")) {
+            state.selectedId = card.dataset.videoId;
+            render();
+            saveSettings();
+            return;
+          }
+
+          const inspectorAction = event.target.closest("[data-inspector-action]")?.dataset.inspectorAction;
+          if (inspectorAction === "favorite") {
+            const video = state.videos.find((item) => item.id === state.selectedId);
+            if (video) updateVideo(video.id, { favorite: !video.favorite });
+          }
+          if (inspectorAction === "remove" && state.selectedId && confirm("Remove this video from the catalog? The file on disk will not be deleted.")) {
+            removeVideos([state.selectedId]);
+          }
+        }
+
+        function handleChange(event) {
+          const batchId = event.target.closest("[data-batch-id]")?.dataset.batchId;
+          if (batchId) {
+            if (event.target.checked) state.batch.add(batchId);
+            else state.batch.delete(batchId);
+            render();
+            return;
+          }
+          const field = event.target.closest("[data-field]")?.dataset.field;
+          if (field) saveInspectorField(event.target, field, true);
+        }
+
+        function handleInput(event) {
+          const field = event.target.closest("[data-field]")?.dataset.field;
+          if (!field) return;
+          clearTimeout(event.target._saveTimer);
+          event.target._saveTimer = setTimeout(() => saveInspectorField(event.target, field, false), 320);
+        }
+
+        function saveInspectorField(input, field, shouldRender) {
+          if (!state.selectedId) return;
+          let value = input.value;
+          if (field === "tags") value = value.split(",").map((tag) => tag.trim().replace(/^#/, "")).filter(Boolean);
+          if (field === "rating") value = Number(value) || 0;
+          updateVideo(state.selectedId, { [field]: value }, { render: shouldRender });
+        }
+
+        els.bulkApplyType.addEventListener("click", () => {
+          if (state.batch.size) bulkPatch([...state.batch], { type: els.bulkType.value });
+        });
+        els.bulkApplyStatus.addEventListener("click", () => {
+          if (state.batch.size) bulkPatch([...state.batch], { status: els.bulkStatus.value });
+        });
+        els.bulkRemove.addEventListener("click", () => {
+          if (state.batch.size && confirm("Remove selected videos from the catalog? Files on disk will not be deleted.")) {
+            removeVideos([...state.batch]);
+          }
+        });
+
+        function getCurrentPageRows() {
+          const filtered = getFilteredVideos();
+          const start = (state.page - 1) * state.pageSize;
+          return filtered.slice(start, start + state.pageSize);
+        }
+
+        async function init() {
+          try {
+            await loadSettings();
+            const rows = await dbAll("videos");
+            state.videos = rows.map(normalizeVideo);
+            els.search.value = state.query;
+            wireEvents();
+            render();
+          } catch (error) {
+            console.error(error);
+            showToast("Could not open the local catalog database.");
+          }
+        }
+
+        init();
+      })();
+    </script>
+  </body>
+</html>
